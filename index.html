@@ -3,11 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>iLoveCV — AI Resume Optimizer</title>
+
+<!-- ── Primary SEO ── -->
+<title>iLoveCV — Free AI Resume Optimizer | ATS-Optimized in Seconds</title>
+<meta name="description" content="Paste your job description and upload your resume (PDF, DOCX, or TXT). iLoveCV's on-device AI rewrites your bullets, matches keywords, and generates an ATS-optimized resume — 100% free, no sign-up, nothing leaves your browser.">
+<meta name="keywords" content="AI resume optimizer, ATS resume builder, resume keyword matcher, free resume optimizer, job description resume match, AI CV writer, resume tailoring tool">
+<meta name="author" content="iLoveCV">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://ilovecv.app/">
+
+<!-- ── Open Graph (LinkedIn, Facebook, WhatsApp) ── -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ilovecv.app/">
+<meta property="og:title" content="iLoveCV — Free AI Resume Optimizer">
+<meta property="og:description" content="Upload your resume, paste the job description. AI rewrites your bullets, matches ATS keywords, and generates a download-ready CV — all in your browser, 100% private.">
+<meta property="og:image" content="https://ilovecv.app/og-image.png">
+<meta property="og:site_name" content="iLoveCV">
+<meta property="og:locale" content="en_US">
+
+<!-- ── Twitter / X Card ── -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://ilovecv.app/">
+<meta name="twitter:title" content="iLoveCV — Free AI Resume Optimizer">
+<meta name="twitter:description" content="AI rewrites your resume to match any job description. ATS keywords, achievement-focused bullets, professional headline — all free, all private.">
+<meta name="twitter:image" content="https://ilovecv.app/og-image.png">
+
+<!-- ── Structured Data (JSON-LD) ── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "iLoveCV",
+  "url": "https://ilovecv.app/",
+  "description": "Free AI-powered resume optimizer. Upload PDF, DOCX, or TXT resume, paste job description, and get an ATS-optimized CV with rewritten bullets and matched keywords — entirely in your browser.",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "AI resume optimization",
+    "ATS keyword matching",
+    "Bullet point rewriting",
+    "PDF, DOCX, TXT resume upload",
+    "Download as PDF or DOCX",
+    "100% private — runs in browser"
+  ]
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
 :root{
   --bg:#f8f9fc;--surface:#fff;--primary:#4f46e5;--pl:#e0e7ff;--pd:#3730a3;
@@ -241,6 +291,29 @@ textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var
 .bullet-progress{font-size:.74rem;color:var(--primary);font-weight:500;margin:6px 0 2px;display:flex;align-items:center;gap:6px}
 .bullet-progress svg{flex-shrink:0;animation:spin .8s linear infinite}
 
+/* ── Free-forever banner ── */
+.free-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#dcfce7,#d1fae5);color:#065f46;border:1px solid #6ee7b7;border-radius:20px;padding:3px 10px;font-size:.72rem;font-weight:700;letter-spacing:.01em}
+.free-badge svg{flex-shrink:0}
+
+/* ── Why-tailor banner on Panel 1 ── */
+.why-card{background:linear-gradient(135deg,#eef2ff 0%,#f0fdf4 100%);border:1px solid var(--pl);border-radius:var(--radius);padding:20px 24px;margin-bottom:14px}
+.why-card h2{font-size:.95rem;font-weight:700;color:var(--primary);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.why-card p{font-size:.82rem;color:var(--text);line-height:1.65;margin-bottom:0}
+.why-stats{display:flex;gap:16px;margin-top:14px;flex-wrap:wrap}
+.why-stat{flex:1;min-width:130px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center}
+.why-stat-num{font-size:1.35rem;font-weight:800;color:var(--primary);line-height:1}
+.why-stat-lbl{font-size:.71rem;color:var(--muted);margin-top:3px;line-height:1.3}
+
+/* ── Footer ── */
+footer{background:var(--surface);border-top:1px solid var(--border);padding:22px 0 18px;margin-top:8px}
+.footer-in{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-brand{font-weight:700;font-size:.9rem;color:var(--primary);display:flex;align-items:center;gap:6px}
+.footer-india{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:4px}
+.india-flag{font-size:1rem}
+.footer-links{font-size:.76rem;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap}
+.footer-links span{display:flex;align-items:center;gap:4px}
+.footer-links svg{flex-shrink:0}
+
 /* ── Print area ── */
 #printArea{position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:46px 54px;font-family:'Calibri',Arial,sans-serif;font-size:11pt;line-height:1.55;color:#111;box-sizing:border-box}
 #printArea h1{font-size:19pt;font-weight:700;margin-bottom:2px}
@@ -290,10 +363,16 @@ textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var
   <div class="h-in">
     <div class="logo">
       <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      iLoveCV
+      <h1 style="font-size:inherit;font-weight:inherit;margin:0;display:inline">iLoveCV</h1>
       <span class="logo-sub">AI Resume Optimizer</span>
     </div>
-    <div class="h-rt" id="gpuStatus">Checking browser AI support…</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+      <span class="free-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        FREE forever
+      </span>
+      <div class="h-rt" id="gpuStatus">Checking browser AI support…</div>
+    </div>
   </div>
 </header>
 
@@ -312,18 +391,50 @@ textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var
 
 <!-- ════ PANEL 1: Upload ════ -->
 <div class="panel active" id="panel1">
+  <!-- Visually hidden hero text for SEO — describes the tool for crawlers -->
+  <p style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap">
+    iLoveCV is a free AI resume optimizer. Upload your resume as PDF, DOCX, or TXT, paste the job description, and our on-device AI rewrites your bullet points, matches ATS keywords, and generates a tailored, download-ready resume — no sign-up required, 100% private.
+  </p>
+  <!-- Why tailor your resume -->
+  <div class="why-card">
+    <h2>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Why tailoring your resume to the Job Description is critical
+    </h2>
+    <p>Most companies use <strong>Applicant Tracking Systems (ATS)</strong> that automatically score and filter resumes before a human ever sees them. A generic resume — no matter how impressive — gets rejected silently. Tailoring every resume to the specific JD is the single highest-impact thing you can do in your job search.</p>
+    <div class="why-stats">
+      <div class="why-stat">
+        <div class="why-stat-num">75%</div>
+        <div class="why-stat-lbl">of resumes are rejected by ATS before reaching a recruiter</div>
+      </div>
+      <div class="why-stat">
+        <div class="why-stat-num">6 sec</div>
+        <div class="why-stat-lbl">average time a recruiter spends on a resume at first glance</div>
+      </div>
+      <div class="why-stat">
+        <div class="why-stat-num">3×</div>
+        <div class="why-stat-lbl">more likely to get an interview with a tailored, keyword-matched CV</div>
+      </div>
+      <div class="why-stat">
+        <div class="why-stat-num">100%</div>
+        <div class="why-stat-lbl">private — AI runs in your browser, your data never leaves your device</div>
+      </div>
+    </div>
+  </div>
+
   <div class="two-col">
     <div class="card">
-      <div class="ct">Upload Your Resume (PDF)</div>
-      <div class="cd">Skills and experience will be extracted automatically.</div>
+      <div class="ct">Upload Your Resume</div>
+      <div class="cd">PDF, DOCX, or TXT — skills and experience will be extracted automatically.</div>
       <div class="upload-zone" id="cvZone">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <p>Drag & drop PDF here or <strong>click to browse</strong></p>
+        <p>Drag & drop your resume or <strong>click to browse</strong></p>
+        <p style="font-size:.74rem;color:var(--muted);margin-top:4px">PDF · DOCX · TXT</p>
         <div id="cvBadge" class="file-ok" style="display:none">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           <span id="cvName"></span>
         </div>
-        <input type="file" accept=".pdf" id="cvInput">
+        <input type="file" accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain" id="cvInput">
       </div>
     </div>
     <div class="card">
@@ -539,6 +650,38 @@ We are looking for a Senior ML Engineer with strong experience in PyTorch, LangC
 
 </div><!-- /con -->
 
+<!-- ══ Footer ══ -->
+<footer>
+  <div class="footer-in">
+    <div class="footer-brand">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      iLoveCV
+      <span class="free-badge" style="margin-left:4px">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        FREE forever
+      </span>
+    </div>
+    <div class="footer-india">
+      <span class="india-flag">🇮🇳</span>
+      Made with ❤️ in India
+    </div>
+    <div class="footer-links">
+      <span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        No sign-up required
+      </span>
+      <span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        100% private — runs in your browser
+      </span>
+      <span>
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Your data never leaves your device
+      </span>
+    </div>
+  </div>
+</footer>
+
 <script>
 // ═══════════════════════════════════════════
 //  STATE
@@ -591,6 +734,48 @@ async function extractPdfText(file) {
     if (p < pdf.numPages) lines.push('');
   }
   return lines.join('\n');
+}
+
+// ═══════════════════════════════════════════
+//  DOCX TEXT EXTRACTION (via mammoth.js)
+// ═══════════════════════════════════════════
+async function extractDocxText(file) {
+  const buf = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: buf });
+  if (!result.value || result.value.trim().length < 10)
+    throw new Error('Could not extract text from DOCX. Is the file a valid Word document?');
+  return result.value;
+}
+
+// ═══════════════════════════════════════════
+//  TXT TEXT EXTRACTION
+// ═══════════════════════════════════════════
+async function extractTxtText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const text = e.target.result || '';
+      if (text.trim().length < 10) reject(new Error('Text file appears to be empty.'));
+      else resolve(text);
+    };
+    reader.onerror = () => reject(new Error('Could not read text file.'));
+    reader.readAsText(file);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  RESUME TEXT EXTRACTION ROUTER
+// ═══════════════════════════════════════════
+async function extractResumeText(file) {
+  const name = file.name.toLowerCase();
+  const type = file.type || '';
+  if (name.endsWith('.pdf') || type === 'application/pdf')
+    return extractPdfText(file);
+  if (name.endsWith('.docx') || type.includes('wordprocessingml'))
+    return extractDocxText(file);
+  if (name.endsWith('.txt') || type === 'text/plain')
+    return extractTxtText(file);
+  throw new Error(`Unsupported file type "${file.name}". Please upload a PDF, DOCX, or TXT file.`);
 }
 
 // ═══════════════════════════════════════════
@@ -712,24 +897,46 @@ function appendChangeCard(card) {
 
 function cleanOut(t) {
   if (!t||typeof t!=='string') return null;
-  let c = t.trim()
-    // Strip wrapping quotes/backticks
-    .replace(/^["'`]+|["'`]+$/g,'')
-    // Strip any opening line that ends with a colon and reads as a preamble sentence
-    // e.g. "Here is the reorganized skills section for a Data & Analytics role, prioritizing…:"
-    .replace(/^here['']?s\b[^:\n]{0,120}:\s*/i,'')
-    .replace(/^here\s+is\b[^:\n]{0,120}:\s*/i,'')
-    // Strip simpler preamble variants
-    .replace(/^(rewritten|output|result|enhanced|improved|updated|optimized)\s*(bullet|summary|headline|title|skills|section|version)?\s*[:\s]+/i,'')
-    .replace(/^(bullet|summary|headline|title|version|skills\s*section)\s*[:\s]+/i,'')
-    .replace(/^(here you go|here it is|sure|certainly|of course|below|as requested)[!,.\s]+/i,'')
-    // Strip trailing **Note:** / Note: blocks (markdown or plain)
-    .replace(/\n+\s*\*{0,2}note\*{0,2}[:\s].+$/is,'')
-    // Strip trailing parenthetical meta-commentary "(I've kept all original skills…)"
-    .replace(/\n+\s*\([^)]{15,}\)\s*$/,'')
-    // Strip trailing explanation lines ("I've kept… / I've added… / I've formatted…")
-    .replace(/\n+\s*i['']ve\s+(kept|added|formatted|included|maintained|reorganized|prioritized)[^.]*\.?\s*$/im,'')
-    .trim();
+  let c = t.trim();
+
+  // ── 1. Strip wrapping quotes / backticks ──
+  c = c.replace(/^["'`]+|["'`]+$/g,'');
+
+  // ── 2. Strip "Transforming the bullet/original bullet for a …:" header lines ──
+  //    e.g. "Transforming the original bullet for a Lead/Staff ML role:"
+  //    e.g. "Transforming the bullet:"
+  c = c.replace(/^transform\w*\s+the\s+\w+[^:\n]{0,120}:\s*/i,'');
+  c = c.replace(/^transform\w*\s+\w+\s+bullet[^:\n]{0,80}:\s*/i,'');
+
+  // ── 3. Strip "Here is/Here's …:" opening sentence preambles ──
+  c = c.replace(/^here['']?s\b[^:\n]{0,120}:\s*/i,'');
+  c = c.replace(/^here\s+is\b[^:\n]{0,120}:\s*/i,'');
+
+  // ── 4. Strip simple label prefixes ──
+  c = c.replace(/^(rewritten|transformed|output|result|enhanced|improved|updated|optimized)\s*(bullet|summary|headline|title|skills|section|version)?\s*[:\s]+/i,'');
+  c = c.replace(/^(bullet|transformed\s+bullet|rewritten\s+bullet|new\s+bullet|summary|headline|title|version|skills\s*section)\s*[:\s]+/i,'');
+  c = c.replace(/^(here you go|here it is|sure|certainly|of course|below|as requested)[!,.\s]+/i,'');
+
+  // ── 5. Strip chain-of-thought reasoning blocks ──
+  // The LLM sometimes outputs a bullet-list of reasoning steps before the actual result.
+  // Detect the pattern: multiple consecutive lines starting with "* " or "- " that each
+  // mention verbs/steps (e.g. "* Started with "Developed"", "* Added placeholder [X%]")
+  // then the real sentence follows. We want only the last non-bullet line.
+  const lines = c.split('\n');
+  const reasoningBullet = /^\s*[\*\-]\s+(started|used|kept|added|embedded|changed|transformed|replaced|begin|chose|picked|selected|using|following|applied|avoided|made|included|ensured|noted|placed)\b/i;
+  const isReasoningBlock = lines.filter(l=>l.trim()).length > 1 && lines.some(l=>reasoningBullet.test(l));
+  if (isReasoningBlock) {
+    // Keep only lines that are NOT reasoning bullets
+    const realLines = lines.filter(l => !reasoningBullet.test(l) && l.trim());
+    if (realLines.length > 0) c = realLines.join('\n').trim();
+  }
+
+  // ── 6. Strip trailing note / meta-commentary ──
+  c = c.replace(/\n+\s*\*{0,2}note\*{0,2}[:\s].+$/is,'');
+  c = c.replace(/\n+\s*\([^)]{15,}\)\s*$/,'');
+  c = c.replace(/\n+\s*i['']ve\s+(kept|added|formatted|included|maintained|reorganized|prioritized)[^.]*\.?\s*$/im,'');
+
+  c = c.trim();
   if (c.length<6||c.length>1200) return null;
   return c;
 }
@@ -864,24 +1071,16 @@ async function rewriteBullet(origLine, roleAnalysis, relevantKws, isWeak, onToke
   const kwStr = relevantKws.slice(0,5).join(', ');
   const verbStr = verbs.join(', ');
   const toneStr = tone.slice(0,2).join(' and ');
-  const sys = `You are a professional resume writer for ${type} roles. Output ONLY the rewritten bullet — no intro, no "Here's the rewritten bullet:", no notes, no explanation.`;
-  const usr = `Transform this resume bullet for a ${seniority} ${type} role.
+  const sys = `You are a professional resume writer for ${type} roles. Output ONLY the final rewritten bullet sentence — no intro, no "Transforming the bullet:", no reasoning steps, no bullet-point lists explaining what you did, no notes, no preamble of any kind. Just the bullet text.`;
+  const usr = `Rewrite this resume bullet for a ${seniority} ${type} role.
 
-Preferred action verbs for this role: ${verbStr}
+Action verbs: ${verbStr}
 Tone: ${toneStr}
-Keywords to embed if genuinely relevant: ${kwStr}
+Keywords (embed only if relevant): ${kwStr}
 
-Original bullet:
-"${origLine}"
+Original: "${origLine}"
 
-Requirements:
-${isWeak?'- This bullet is duty-based ("Responsible for…", "Worked on…") — transform it into an ACHIEVEMENT statement\n':''}
-- Start with a strong verb from the preferred list if it fits naturally
-- If no metrics exist, add a realistic placeholder like [X%], [N+ users], [$XK], [N team members]
-- Maximum 2 lines
-- Only embed keywords that genuinely fit the described work
-- Avoid: "Responsible for", "Worked on", "Helped with", "Involved in", "Assisted"
-- Output ONLY the rewritten bullet, no preamble`;
+${isWeak?'Transform from duty-based to achievement-based. ':''}Start with a strong verb. Add a metric placeholder like [X%] or [N+ users] if none exist. Max 2 lines. Output the bullet text ONLY — no explanation, no list of steps taken, no "Transforming…" header.`;
   return await llm(sys, usr, 220, onToken);
 }
 
@@ -926,30 +1125,43 @@ ${allSkills}
 
 Rules:
 - Output EXACTLY 2-4 lines total, no more
-- Each line: "Category: skill1, skill2, skill3" — one line per category, no duplicates
+- Each line format: "Label: skill1, skill2, skill3" where Label is a short name like "AI/ML", "Cloud", "Languages"
+- Do NOT prefix lines with the word "Category" — the label IS the category name
 - Do NOT repeat any line or skill
-- Do NOT output the same category more than once
+- Do NOT output the same label more than once — merge duplicates into one line
 - Put the most JD-relevant skills FIRST
 - Keep ALL original skills; add critical missing ones from the keyword list
-- DO NOT write any intro sentence, explanation, or note — start immediately with the first category`;
+- DO NOT write any intro sentence, explanation, or note — start immediately with the first label`;
   const result = await llm(sys, usr, 220, onToken);
   if (!result) return skillsLines;
 
-  // Post-process: deduplicate lines and strip junk
+  // Post-process: strip "Category:" prefix, deduplicate by label, remove junk
   const lines = result.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-  const seen = new Set();
+  const seenFull = new Set();
+  const seenLabel = new Set();
   const cleaned = [];
-  for (const line of lines) {
-    // Skip lines that look like raw keyword dumps (no colon = no category label)
-    // and lines that are near-duplicates of already-seen ones
-    const key = line.toLowerCase().replace(/\s+/g,'');
-    if (seen.has(key)) continue;
-    // Skip lines that are just a handful of bare words with no category structure
-    // (e.g. "payments | sql | must | type") — valid lines have a "Word: ..." pattern
-    const hasCategory = /^[A-Za-z][^:]{1,30}:/.test(line);
-    const isPipeOnly = !hasCategory && line.split('|').length > 2;
-    if (isPipeOnly && cleaned.length > 0) continue; // junk at end
-    seen.add(key);
+  for (let line of lines) {
+    // Strip leading "Category:" or "Category :" prefix the model sometimes emits
+    line = line.replace(/^category\s*:\s*/i, '');
+    if (!line) continue;
+
+    // Skip exact duplicate lines
+    const fullKey = line.toLowerCase().replace(/\s+/g, '');
+    if (seenFull.has(fullKey)) continue;
+    seenFull.add(fullKey);
+
+    // Extract the label (everything before the first colon)
+    const colonIdx = line.indexOf(':');
+    if (colonIdx > 0) {
+      const label = line.slice(0, colonIdx).trim().toLowerCase();
+      // Deduplicate by label — skip if we already have a line with same label
+      if (seenLabel.has(label)) continue;
+      seenLabel.add(label);
+    } else {
+      // No colon = no label structure; skip bare pipe-only junk if we already have content
+      if (cleaned.length > 0 && line.split('|').length > 2) continue;
+    }
+
     cleaned.push(line);
     if (cleaned.length >= 5) break; // hard cap
   }
@@ -1495,13 +1707,13 @@ function updateRoleDisplay(ra) {
 let cvOk=false,jdOk=false;
 document.getElementById('cvInput').addEventListener('change',async e=>{
   const file=e.target.files[0]; if(!file) return;
-  showSpin('Reading your PDF…');
+  showSpin('Reading your resume…');
   try{
-    S.cvText=await extractPdfText(file);
+    S.cvText=await extractResumeText(file);
     document.getElementById('cvName').textContent=file.name;
     document.getElementById('cvBadge').style.display='inline-flex';
     cvOk=true; checkRdy();
-  }catch(err){alert('Could not read PDF: '+err.message);}
+  }catch(err){alert('Could not read file: '+err.message);}
   hideSpin();
 });
 const zone=document.getElementById('cvZone');
@@ -1510,9 +1722,14 @@ zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
 zone.addEventListener('drop',e=>{
   e.preventDefault();zone.classList.remove('drag-over');
   const f=e.dataTransfer.files[0];
-  if(f&&f.type==='application/pdf'){
+  if(!f) return;
+  const allowed=['application/pdf','application/vnd.openxmlformats-officedocument.wordprocessingml.document','text/plain'];
+  const ext=f.name.toLowerCase();
+  if(allowed.includes(f.type)||ext.endsWith('.pdf')||ext.endsWith('.docx')||ext.endsWith('.txt')){
     const dt=new DataTransfer();dt.items.add(f);
     const inp=document.getElementById('cvInput');inp.files=dt.files;inp.dispatchEvent(new Event('change'));
+  } else {
+    alert('Please drop a PDF, DOCX, or TXT file.');
   }
 });
 document.getElementById('jdInput').addEventListener('input',e=>{jdOk=e.target.value.trim().length>20;checkRdy();});
