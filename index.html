@@ -1,0 +1,1817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iLoveCV — AI Resume Optimizer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+<style>
+:root{
+  --bg:#f8f9fc;--surface:#fff;--primary:#4f46e5;--pl:#e0e7ff;--pd:#3730a3;
+  --text:#1e293b;--muted:#64748b;--border:#e2e8f0;
+  --success:#10b981;--sl:#d1fae5;
+  --warn:#f59e0b;--wl:#fef3c7;
+  --danger:#ef4444;
+  --radius:12px;--shadow:0 1px 3px rgba(0,0,0,.07);--shadow-lg:0 8px 24px rgba(0,0,0,.1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh}
+
+/* ── Header ── */
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 0;position:sticky;top:0;z-index:50}
+.h-in{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:1.3rem;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:8px}
+.logo-sub{font-size:.7rem;background:var(--pl);color:var(--primary);padding:2px 8px;border-radius:20px;font-weight:600;margin-left:2px}
+.h-rt{font-size:.74rem;color:var(--muted)}
+
+/* ── Steps ── */
+.steps{max-width:1100px;margin:0 auto;padding:16px 24px;display:flex;align-items:center}
+.si{display:flex;align-items:center;gap:7px;font-size:.81rem;font-weight:500;color:var(--muted);white-space:nowrap;transition:color .3s}
+.si.active{color:var(--primary)} .si.done{color:var(--success)}
+.sn{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;background:var(--border);color:var(--muted);transition:all .3s;flex-shrink:0}
+.si.active .sn{background:var(--primary);color:#fff} .si.done .sn{background:var(--success);color:#fff}
+.sl{flex:1;height:2px;background:var(--border);margin:0 8px;min-width:12px;transition:background .3s}
+.sl.done{background:var(--success)}
+
+/* ── Container / Panel ── */
+.con{max-width:1100px;margin:0 auto;padding:0 24px 60px}
+.panel{display:none}.panel.active{display:block;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Card ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+.card+.card{margin-top:13px}
+.ct{font-size:1rem;font-weight:600;margin-bottom:2px}
+.cd{font-size:.82rem;color:var(--muted);margin-bottom:14px}
+
+/* ── Grid ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:820px){.two-col,.three-col{grid-template-columns:1fr}}
+
+/* ── Upload zone ── */
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:32px 18px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-zone:hover,.upload-zone.drag-over{border-color:var(--primary);background:var(--pl)}
+.upload-zone svg{width:32px;height:32px;color:var(--muted);display:block;margin:0 auto 9px}
+.upload-zone p{color:var(--muted);font-size:.86rem}
+.upload-zone strong{color:var(--primary)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-ok{display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:4px 12px;background:var(--sl);color:#065f46;border-radius:20px;font-size:.79rem;font-weight:600}
+
+/* ── Textarea ── */
+textarea{width:100%;min-height:190px;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:inherit;font-size:.89rem;resize:vertical;line-height:1.6;color:var(--text);transition:border-color .2s}
+textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--pl)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;font-size:.87rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:all .18s;font-family:inherit}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--pd)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:var(--pl)}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#059669}
+.btn-sm{padding:6px 14px;font-size:.79rem}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg)}
+.btn-group{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
+
+/* ── Score ring ── */
+.score-wrap{text-align:center;padding:14px 0}
+.score-ring{width:118px;height:118px;margin:0 auto 9px;position:relative}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring circle{fill:none;stroke-width:9}
+.score-ring .bg{stroke:var(--border)}.score-ring .pr{stroke:var(--primary);stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)}
+.score-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.65rem;font-weight:700;color:var(--primary)}
+.score-lbl{font-size:.78rem;color:var(--muted);margin-bottom:2px}
+.score-msg{font-size:.8rem;color:var(--muted);margin-top:5px}
+
+/* ── Role analysis card ── */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:700px){.role-grid{grid-template-columns:1fr 1fr}}
+.role-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.role-item-label{font-size:.71rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.role-item-value{font-size:.88rem;font-weight:600;color:var(--text)}
+.tone-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.tone-pill{padding:2px 9px;border-radius:20px;font-size:.72rem;font-weight:500;background:var(--pl);color:var(--pd)}
+
+/* ── Keywords ── */
+.kw-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.kw{padding:3px 10px;border-radius:20px;font-size:.76rem;font-weight:500}
+.kw-match{background:var(--sl);color:#065f46}
+.kw-miss{background:#fee2e2;color:#991b1b}
+.kw-added{background:var(--pl);color:var(--pd)}
+
+/* ── Improvements ── */
+.imp-list{list-style:none;margin-top:4px}
+.imp-list li{display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.84rem;line-height:1.5}
+.imp-list li:last-child{border:none}
+.imp-icon{width:16px;height:16px;flex-shrink:0;margin-top:2px}
+
+/* ── AI badge ── */
+.ai-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:20px;font-size:.77rem;font-weight:600}
+.ai-badge.loading{background:var(--wl);color:#92400e}
+.ai-badge.ready{background:var(--sl);color:#065f46}
+.ai-badge.fallback{background:var(--pl);color:var(--pd)}
+.ai-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.ai-dot.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Resume preview ── */
+.resume-editable{min-height:460px;border:1px solid var(--border);border-radius:8px;padding:28px 32px;outline:none;font-size:.9rem;line-height:1.75;background:#fff;font-family:'Calibri','Georgia',serif;position:relative}
+.resume-editable:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--pl)}
+.resume-editable h1{font-size:1.38rem;font-weight:700;margin-bottom:1px;letter-spacing:.01em}
+.resume-editable h2{font-size:.93rem;font-weight:700;color:var(--primary);margin-top:17px;margin-bottom:5px;border-bottom:1.5px solid var(--pl);padding-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
+.resume-editable p{margin-bottom:4px}
+.resume-editable .cl{color:var(--muted);font-size:.82rem;margin-bottom:2px}
+.resume-editable .job-title-line{font-weight:700;font-size:.93rem;margin-bottom:1px}
+.resume-editable .job-meta-line{color:var(--muted);font-size:.8rem;margin-bottom:4px}
+.resume-editable .bullet{padding-left:16px;position:relative;margin-bottom:4px}
+.resume-editable .bullet::before{content:'•';position:absolute;left:2px;color:var(--primary)}
+/* keyword highlight */
+.resume-editable mark{background:#fef3c7;border-radius:2px;padding:0 2px}
+/* fill-in placeholder */
+.resume-editable .fill{background:#fce7f3;color:#9d174d;border:1px dashed #f9a8d4;border-radius:3px;padding:0 4px;cursor:pointer;font-size:.84em;font-weight:600}
+.fill-hint{font-size:.72rem;color:#9d174d;margin-left:4px;font-style:italic}
+
+/* ── Processing steps ── */
+.proc-steps{margin:14px 0;padding:14px 18px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.proc-step{display:flex;align-items:center;gap:9px;padding:5px 0;font-size:.83rem;color:var(--muted)}
+.proc-step.active{color:var(--primary);font-weight:500}
+.proc-step.done{color:var(--success)}
+.ps-icon{width:15px;height:15px;flex-shrink:0}
+
+/* ── Change log ── */
+.changelog{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:14px}
+.changelog-hdr{padding:14px 20px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.changelog-hdr:hover{background:#f1f5f9}
+.changelog-title{font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:8px}
+.change-count-badge{background:var(--primary);color:#fff;border-radius:20px;padding:2px 8px;font-size:.72rem;font-weight:700}
+.changelog-body{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+.changelog-body.open{max-height:340px;padding:16px 20px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.changelog-body.open::-webkit-scrollbar{width:5px}
+.changelog-body.open::-webkit-scrollbar-track{background:transparent}
+.changelog-body.open::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.change-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:.83rem}
+.change-item:last-child{border:none}
+.change-item-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci-summary{background:#e0f2fe;color:#0369a1}
+.ci-bullet{background:#f0fdf4;color:#15803d}
+.ci-tone{background:#faf5ff;color:#7c3aed}
+.ci-skill{background:#fff7ed;color:#c2410c}
+.ci-title{background:#fdf2f8;color:#9d174d}
+.change-item-text{}
+.change-item-text strong{display:block;font-weight:600;margin-bottom:1px}
+.change-item-text span{color:var(--muted);font-size:.78rem}
+.before-after{margin-top:3px}
+.ba-before{color:#991b1b;font-size:.76rem;font-style:italic;padding:2px 6px;background:#fee2e2;border-radius:3px;display:inline-block;margin-right:4px}
+.ba-after{color:#065f46;font-size:.76rem;padding:2px 6px;background:var(--sl);border-radius:3px;display:inline-block}
+
+/* ── Before/After toggle ── */
+.preview-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.toggle-group{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.toggle-btn{padding:5px 14px;font-size:.78rem;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:all .15s;font-family:inherit}
+.toggle-btn.active{background:var(--primary);color:#fff}
+
+/* ── Fill-in banner ── */
+.fill-banner{background:#fdf2f8;border:1px solid #f9a8d4;border-radius:8px;padding:10px 16px;font-size:.82rem;color:#9d174d;display:none;margin-top:10px;align-items:center;gap:8px}
+.fill-banner.show{display:flex}
+
+/* ── LLM modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(6px);z-index:400;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:18px;padding:36px 38px;max-width:490px;width:92%;box-shadow:0 24px 64px rgba(0,0,0,.22);text-align:center}
+.modal-emoji{font-size:2.4rem;margin-bottom:10px;display:block}
+.modal h2{font-size:1.18rem;font-weight:700;margin-bottom:7px}
+.modal-desc{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.model-tags{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.model-tag{padding:3px 11px;background:var(--pl);color:var(--pd);border-radius:20px;font-size:.74rem;font-weight:600}
+.progress-track{height:7px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:8px}
+.progress-fill{height:100%;background:var(--primary);border-radius:4px;transition:width .3s ease;width:0%}
+.progress-fill.success{background:var(--success)}
+.progress-text{font-size:.8rem;color:var(--muted);min-height:18px;margin-bottom:14px}
+.modal-actions{display:flex;gap:9px;justify-content:center}
+
+/* ── DL cards ── */
+.dl-cards{display:flex;gap:13px;margin-top:14px;flex-wrap:wrap}
+.dl-card{flex:1;min-width:160px;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:all .2s}
+.dl-card:hover{border-color:var(--primary);box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+.dl-card svg{width:28px;height:28px;color:var(--primary);display:block;margin:0 auto 9px}
+.dl-card h3{font-size:.9rem;margin-bottom:2px}.dl-card p{font-size:.74rem;color:var(--muted)}
+
+/* ── Spinner ── */
+.spin-ov{display:none;position:fixed;inset:0;background:rgba(255,255,255,.88);z-index:300;flex-direction:column;align-items:center;justify-content:center;gap:11px}
+.spin-ov.show{display:flex}
+.spin{width:40px;height:40px;border:4px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-msg{font-size:.86rem;color:var(--muted);font-weight:500}
+
+/* ── Stat mini cards ── */
+.stat-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.stat-card{flex:1;min-width:100px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;text-align:center}
+.stat-num{font-size:1.4rem;font-weight:700;color:var(--primary)}
+.stat-lbl{font-size:.72rem;color:var(--muted);margin-top:1px}
+
+/* ── Util ── */
+.mt-4{margin-top:4px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}
+.flex-between{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.72rem;font-weight:500}
+
+/* ── Live streaming token area ── */
+.stream-token-area{background:#f0f4ff;border:1px solid var(--pl);border-radius:8px;padding:10px 14px;margin:10px 0 4px;display:none;animation:fadeUp .2s ease}
+.stream-token-label{font-size:.72rem;font-weight:600;color:var(--primary);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.stream-token-label::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--primary);animation:pulse 1s ease-in-out infinite}
+.stream-token-content{font-size:.8rem;color:var(--text);line-height:1.55;max-height:96px;overflow:hidden;word-break:break-word;white-space:pre-wrap}
+.stream-token-content::after{content:'▋';display:inline-block;animation:blink .7s step-end infinite;color:var(--primary);font-size:.75rem;margin-left:1px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+/* ── Live preview section flash ── */
+@keyframes sectionFlash{0%{background:var(--sl)}60%{background:#e0fff0}100%{background:transparent}}
+@keyframes slideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.section-live-update{animation:sectionFlash 1.4s ease forwards}
+.section-new-content{animation:slideIn .35s ease}
+
+/* ── Changelog card entry animation ── */
+@keyframes cardSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.change-item-new{animation:cardSlideIn .4s ease}
+
+/* ── Bullet progress label ── */
+.bullet-progress{font-size:.74rem;color:var(--primary);font-weight:500;margin:6px 0 2px;display:flex;align-items:center;gap:6px}
+.bullet-progress svg{flex-shrink:0;animation:spin .8s linear infinite}
+
+/* ── Print area ── */
+#printArea{position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:46px 54px;font-family:'Calibri',Arial,sans-serif;font-size:11pt;line-height:1.55;color:#111;box-sizing:border-box}
+#printArea h1{font-size:19pt;font-weight:700;margin-bottom:2px}
+#printArea .cl{font-size:9.5pt;color:#555;margin-bottom:9px}
+#printArea h2{font-size:10pt;font-weight:700;color:#4f46e5;border-bottom:1.5px solid #c7d2fe;margin-top:13px;margin-bottom:5px;padding-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
+#printArea p{margin-bottom:4px}
+#printArea .bullet{padding-left:13px;position:relative;margin-bottom:3px}
+#printArea .bullet::before{content:'•';position:absolute;left:1px;color:#4f46e5}
+#printArea mark,#printArea .fill{background:transparent!important;color:inherit!important;border:none!important}
+#printArea .job-title-line{font-weight:700;font-size:10.5pt}
+#printArea .job-meta-line{font-size:9.5pt;color:#555;margin-bottom:3px}
+</style>
+</head>
+<body>
+
+<!-- ══ LLM Download Modal ══ -->
+<div class="modal-overlay" id="llmModal">
+  <div class="modal">
+    <span class="modal-emoji">🧠</span>
+    <h2>Setting Up AI Resume Writer</h2>
+    <p class="modal-desc">
+      Downloading <strong>Llama 3.2 1B</strong> (quantized) to your browser. It runs fully on your device — your resume never leaves your machine.
+    </p>
+    <div class="model-tags">
+      <span class="model-tag">Llama 3.2 · 1B params</span>
+      <span class="model-tag">4-bit quantized · ~880 MB</span>
+      <span class="model-tag">Cached after first use</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="llmBar"></div></div>
+    <div class="progress-text" id="llmMsg">Initializing WebGPU…</div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" id="btnSkipLLM">Skip AI · Use smart rules</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Spinner ══ -->
+<div class="spin-ov" id="spinner">
+  <div class="spin"></div>
+  <div class="spin-msg" id="spinMsg">Processing…</div>
+</div>
+
+<div id="printArea"></div>
+
+<!-- ══ Header ══ -->
+<header>
+  <div class="h-in">
+    <div class="logo">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      iLoveCV
+      <span class="logo-sub">AI Resume Optimizer</span>
+    </div>
+    <div class="h-rt" id="gpuStatus">Checking browser AI support…</div>
+  </div>
+</header>
+
+<!-- Steps bar -->
+<div class="steps" id="stepsBar">
+  <div class="si active" data-step="1"><span class="sn">1</span>Upload</div>
+  <div class="sl" id="sl12"></div>
+  <div class="si" data-step="2"><span class="sn">2</span>Analyze</div>
+  <div class="sl" id="sl23"></div>
+  <div class="si" data-step="3"><span class="sn">3</span>Optimize</div>
+  <div class="sl" id="sl34"></div>
+  <div class="si" data-step="4"><span class="sn">4</span>Download</div>
+</div>
+
+<div class="con">
+
+<!-- ════ PANEL 1: Upload ════ -->
+<div class="panel active" id="panel1">
+  <div class="two-col">
+    <div class="card">
+      <div class="ct">Upload Your Resume (PDF)</div>
+      <div class="cd">Skills and experience will be extracted automatically.</div>
+      <div class="upload-zone" id="cvZone">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>Drag & drop PDF here or <strong>click to browse</strong></p>
+        <div id="cvBadge" class="file-ok" style="display:none">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="cvName"></span>
+        </div>
+        <input type="file" accept=".pdf" id="cvInput">
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">Paste Job Description</div>
+      <div class="cd">Role requirements, tone, and keywords will all be analyzed.</div>
+      <textarea id="jdInput" placeholder="Paste the full job description here…
+
+Example:
+We are looking for a Senior ML Engineer with strong experience in PyTorch, LangChain, RAG pipelines, and AWS SageMaker. The ideal candidate is a collaborative leader who drives innovation…"></textarea>
+    </div>
+  </div>
+  <div class="btn-group" style="justify-content:flex-end">
+    <button class="btn btn-primary" id="btnAnalyze" disabled>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Analyze &amp; Optimize
+    </button>
+  </div>
+</div>
+
+<!-- ════ PANEL 2: Analysis ════ -->
+<div class="panel" id="panel2">
+  <!-- AI status bar -->
+  <div style="margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span id="aiBadge" class="ai-badge loading">
+      <span class="ai-dot pulse" id="aiDot" style="background:#f59e0b"></span>
+      <span id="aiBadgeTxt">AI model loading…</span>
+    </span>
+    <span style="font-size:.76rem;color:var(--muted)" id="aiSubTxt">Preparing in the background while you review the analysis.</span>
+  </div>
+
+  <!-- Row 1: Score + Role + Keywords -->
+  <div class="two-col">
+    <div>
+      <div class="card">
+        <div class="score-wrap">
+          <div class="score-lbl">JD Keyword Match Score</div>
+          <div class="score-ring">
+            <svg width="118" height="118" viewBox="0 0 118 118">
+              <circle class="bg" cx="59" cy="59" r="50"/>
+              <circle class="pr" id="scoreCircle" cx="59" cy="59" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+            </svg>
+            <div class="score-num" id="scoreNum">0%</div>
+          </div>
+          <div class="score-msg" id="scoreMsg"></div>
+        </div>
+        <!-- Mini stats -->
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-num" id="statMatched">0</div><div class="stat-lbl">Keywords matched</div></div>
+          <div class="stat-card"><div class="stat-num" id="statMissing">0</div><div class="stat-lbl">To embed</div></div>
+          <div class="stat-card"><div class="stat-num" id="statSections">0</div><div class="stat-lbl">CV sections</div></div>
+        </div>
+      </div>
+
+      <!-- Role detection card -->
+      <div class="card mt-12">
+        <div class="ct">Role &amp; Tone Analysis</div>
+        <div class="cd" style="margin-bottom:8px">Detected from the job description</div>
+        <div class="role-grid" id="roleGrid">
+          <div class="role-item">
+            <div class="role-item-label">Role Type</div>
+            <div class="role-item-value" id="rdType">Analyzing…</div>
+          </div>
+          <div class="role-item">
+            <div class="role-item-label">Seniority</div>
+            <div class="role-item-value" id="rdSenior">Analyzing…</div>
+          </div>
+          <div class="role-item">
+            <div class="role-item-label">Tone to Match</div>
+            <div class="tone-pills" id="rdTone"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- Keywords card -->
+      <div class="card">
+        <div class="ct">Keyword Analysis</div>
+        <div style="margin-bottom:8px">
+          <span class="tag" style="background:var(--sl);color:#065f46">■ Already in your CV</span>
+          &nbsp;<span class="tag" style="background:#fee2e2;color:#991b1b">■ Missing — AI will embed naturally</span>
+        </div>
+        <div class="kw-list" id="kwBadges"></div>
+      </div>
+
+      <!-- What AI will do -->
+      <div class="card mt-12">
+        <div class="ct">AI Optimization Plan</div>
+        <div class="cd" style="margin-bottom:6px">Deep rewrites — not just keyword injection</div>
+        <ul class="imp-list" id="impList"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group" style="justify-content:space-between">
+    <button class="btn btn-outline" onclick="goTo(1)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </button>
+    <button class="btn btn-primary" id="btnOptimize">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate with AI
+    </button>
+  </div>
+</div>
+
+<!-- ════ PANEL 3: Preview ════ -->
+<div class="panel" id="panel3">
+  <div class="card">
+    <!-- Header row -->
+    <div class="preview-header">
+      <div>
+        <div class="ct">AI-Optimized Resume</div>
+        <div class="cd" style="margin-bottom:0">
+          <span class="tag" style="background:#fef3c7;color:#92400e">■ Yellow</span> = embedded keywords &nbsp;
+          <span class="tag" style="background:#fce7f3;color:#9d174d">■ Pink</span> = add your numbers here
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="toggle-group" id="baToggle" style="display:none">
+          <button class="toggle-btn active" id="btnViewOptimized" onclick="showVersion('optimized')">AI Version</button>
+          <button class="toggle-btn" id="btnViewOriginal" onclick="showVersion('original')">Original</button>
+        </div>
+        <button class="btn btn-outline btn-sm" id="btnMakeEditable" onclick="makeEditable()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit
+        </button>
+      </div>
+    </div>
+
+    <!-- Fill-in banner -->
+    <div class="fill-banner" id="fillBanner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>Pink highlighted placeholders need your real numbers. Click them to edit.</span>
+    </div>
+
+    <!-- Processing steps (shown during LLM) -->
+    <div id="procSteps" class="proc-steps" style="display:none">
+      <div class="proc-step" id="ps0"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Parsing CV structure…</div>
+      <div class="proc-step" id="ps1"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Detecting role type, seniority &amp; tone from JD…</div>
+      <div class="proc-step" id="ps2"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Rewriting Professional Summary with role tone…</div>
+      <div class="proc-step" id="ps3"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Transforming experience bullets (duty → achievement)…</div>
+      <div class="proc-step" id="ps4"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Prioritizing skills by role relevance…</div>
+      <div class="proc-step" id="ps5"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Suggesting professional headline for this role…</div>
+      <div class="proc-step" id="ps6"><svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--border)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>Formatting &amp; finalizing…</div>
+    </div>
+
+    <!-- Live streaming token display -->
+    <div class="stream-token-area" id="streamTokenArea">
+      <div class="stream-token-label" id="streamTokenLabel">Generating…</div>
+      <div class="stream-token-content" id="streamTokenContent"></div>
+    </div>
+
+    <div class="resume-editable" id="resumePreview" contenteditable="false"></div>
+  </div>
+
+  <!-- Change log -->
+  <div class="changelog" id="changelogWrap" style="display:none">
+    <div class="changelog-hdr" onclick="toggleChangelog()">
+      <div class="changelog-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        What the AI changed
+        <span class="change-count-badge" id="changeCountBadge">0</span>
+      </div>
+      <svg id="clChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="changelog-body" id="changelogBody"></div>
+  </div>
+
+  <div class="btn-group" style="justify-content:space-between">
+    <button class="btn btn-outline" onclick="goTo(2)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      Back
+    </button>
+    <button class="btn btn-success" id="btnToDownload" style="display:none">
+      Continue to Download
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ════ PANEL 4: Download ════ -->
+<div class="panel" id="panel4">
+  <div class="card" style="text-align:center">
+    <div class="ct" style="font-size:1.12rem">Your AI-Optimized Resume is Ready!</div>
+    <div class="cd">Download in your preferred format.</div>
+    <div class="score-wrap" style="padding:8px 0">
+      <div class="score-lbl">Final Match Score</div>
+      <div class="score-ring">
+        <svg width="118" height="118" viewBox="0 0 118 118">
+          <circle class="bg" cx="59" cy="59" r="50"/>
+          <circle class="pr" id="finalCircle" cx="59" cy="59" r="50" stroke-dasharray="314" stroke-dashoffset="314" style="stroke:var(--success)"/>
+        </svg>
+        <div class="score-num" id="finalNum" style="color:var(--success)">0%</div>
+      </div>
+    </div>
+    <div class="dl-cards">
+      <div class="dl-card" id="dlPdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <h3>Download PDF</h3><p>Best for job applications</p>
+      </div>
+      <div class="dl-card" id="dlDocx">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l1.5-5 1.5 5 1.5-5 1.5 5"/></svg>
+        <h3>Download DOCX</h3><p>Edit further in Word</p>
+      </div>
+    </div>
+  </div>
+  <div class="btn-group" style="justify-content:space-between">
+    <button class="btn btn-outline" onclick="goTo(3)">Back to Edit</button>
+    <button class="btn btn-outline" onclick="location.reload()">Start Over</button>
+  </div>
+</div>
+
+</div><!-- /con -->
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const S = {
+  cvText:'', jdText:'',
+  jdKeywords:[], matched:[], missing:[],
+  cvSections:{}, addedKeywords:[],
+  origScore:0, finalScore:0,
+  llmReady:false, llmSkipped:false, llmEngine:null, gpuAvail:false,
+  // New
+  roleAnalysis:null,      // {type, seniority, tone[], theme, actionVerbs[]}
+  originalHTML:'',        // for before/after toggle
+  optimizedSections:{},   // after LLM rewrite
+  changelog:[],           // list of {icon, category, title, detail, before, after}
+};
+
+// ═══════════════════════════════════════════
+//  PDF.js
+// ═══════════════════════════════════════════
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+async function extractPdfText(file) {
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  const lines = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const ct = await page.getTextContent({ normalizeWhitespace: false });
+    const yMap = new Map();
+    for (const item of ct.items) {
+      if (!item.str) continue;
+      const y = Math.round(item.transform[5] / 2) * 2;
+      if (!yMap.has(y)) yMap.set(y, []);
+      yMap.get(y).push({ x: item.transform[4], str: item.str, w: item.width || 0 });
+    }
+    const ys = [...yMap.keys()].sort((a,b) => b-a);
+    for (const y of ys) {
+      const items = yMap.get(y).sort((a,b) => a.x-b.x);
+      let line = items[0].str;
+      for (let i=1;i<items.length;i++) {
+        const gap = items[i].x - (items[i-1].x + items[i-1].w);
+        if (gap < 1) line += items[i].str;
+        else if (!line.endsWith(' ')&&!items[i].str.startsWith(' ')) line += ' '+items[i].str;
+        else line += items[i].str;
+      }
+      if (line.trim()) lines.push(line.trim());
+    }
+    if (p < pdf.numPages) lines.push('');
+  }
+  return lines.join('\n');
+}
+
+// ═══════════════════════════════════════════
+//  WEBGPU + WebLLM
+// ═══════════════════════════════════════════
+async function checkWebGPU() {
+  if (!navigator.gpu) return false;
+  try { return !!(await navigator.gpu.requestAdapter()); } catch { return false; }
+}
+
+async function initLLM() {
+  try {
+    const { CreateMLCEngine } = await import('https://esm.run/@mlc-ai/web-llm');
+    S.llmEngine = await CreateMLCEngine('Llama-3.2-1B-Instruct-q4f16_1-MLC', {
+      initProgressCallback: ({ progress, text }) => {
+        const pct = Math.min(99, Math.round((progress||0)*100));
+        document.getElementById('llmBar').style.width = pct+'%';
+        document.getElementById('llmMsg').textContent = (text||`Loading… ${pct}%`).slice(0,80);
+      },
+    });
+    document.getElementById('llmBar').style.width='100%';
+    document.getElementById('llmBar').classList.add('success');
+    document.getElementById('llmMsg').textContent='✓ AI model ready';
+    S.llmReady = true;
+    setAIBadge('ready');
+    return true;
+  } catch(err) {
+    console.warn('WebLLM failed:', err);
+    S.llmSkipped = true; setAIBadge('fallback'); return false;
+  }
+}
+
+function setAIBadge(state) {
+  const b=document.getElementById('aiBadge'),d=document.getElementById('aiDot'),
+        t=document.getElementById('aiBadgeTxt'),s=document.getElementById('aiSubTxt');
+  b.className='ai-badge '+state;
+  d.style.background=state==='ready'?'var(--success)':state==='fallback'?'var(--primary)':'#f59e0b';
+  d.className='ai-dot'+(state==='loading'?' pulse':'');
+  if(state==='ready'){t.textContent='AI ready (Llama 3.2 1B) ✓';s.textContent='Deep tone-aware rewriting enabled.';}
+  else if(state==='fallback'){t.textContent='Smart optimization (no download)';s.textContent='Using rule-based keyword matching.';}
+  else{t.textContent='AI model loading…';s.textContent='Preparing in background while you review.';}
+}
+
+// ═══════════════════════════════════════════
+//  LLM CORE — streaming call
+// ═══════════════════════════════════════════
+async function llm(sys, usr, maxTok=300, onToken=null) {
+  if (!S.llmEngine) return null;
+  try {
+    let out='';
+    const stream = await S.llmEngine.chat.completions.create({
+      messages:[{role:'system',content:sys},{role:'user',content:usr}],
+      max_tokens:maxTok, temperature:0.22, top_p:0.9, stream:true,
+    });
+    for await (const chunk of stream) {
+      const tok = chunk.choices[0]?.delta?.content||'';
+      if (tok) { out += tok; if (onToken) onToken(out); }
+    }
+    return cleanOut(out);
+  } catch(e){ console.warn('LLM call err:',e); return null; }
+}
+
+// ── Stream token display helpers ──
+function showStream(label) {
+  const area = document.getElementById('streamTokenArea');
+  document.getElementById('streamTokenLabel').textContent = label;
+  document.getElementById('streamTokenContent').textContent = '';
+  area.style.display = 'block';
+}
+function updateStream(text) {
+  const el = document.getElementById('streamTokenContent');
+  if (el) el.textContent = text.slice(-300); // Show last 300 chars
+}
+function hideStream() {
+  document.getElementById('streamTokenArea').style.display = 'none';
+  document.getElementById('streamTokenContent').textContent = '';
+}
+
+// ── Live preview update (patch without full scroll reset) ──
+function renderLivePreview(sections, addedSet) {
+  const preview = document.getElementById('resumePreview');
+  const scrollY = preview.scrollTop;
+  // Pass original sections so diff-highlighting shows ALL changes
+  const html = buildHTML(sections, addedSet, S.originalSections || null);
+  preview.innerHTML = markFillIns(html);
+  preview.scrollTop = scrollY;
+}
+
+// ── Append one change card to the log (real-time) ──
+function appendChangeCard(card) {
+  const body = document.getElementById('changelogBody');
+  const wrap = document.getElementById('changelogWrap');
+  const badge = document.getElementById('changeCountBadge');
+  // Show + open changelog on first card
+  if (wrap.style.display === 'none' || !wrap.style.display) {
+    wrap.style.display = 'block';
+    body.classList.add('open');
+    document.getElementById('clChevron').style.transform = 'rotate(180deg)';
+  }
+  badge.textContent = S.changelog.length;
+  const item = document.createElement('div');
+  item.className = 'change-item change-item-new';
+  item.innerHTML = `
+    <div class="change-item-icon ${card.icon}">
+      ${card.icon==='ci-summary'?'✍️':card.icon==='ci-bullet'?'⚡':card.icon==='ci-tone'?'🎨':card.icon==='ci-skill'?'🛠️':'🏷️'}
+    </div>
+    <div class="change-item-text">
+      <strong>${esc(card.cat)}: ${esc(card.title)}</strong>
+      <span>${esc(card.detail||'')}</span>
+      ${card.before&&card.after?`<div class="before-after mt-4">
+        <span class="ba-before">Before: ${esc(card.before.slice(0,60))}${card.before.length>60?'…':''}</span>
+        <span class="ba-after">After: ${esc(card.after.slice(0,60))}${card.after.length>60?'…':''}</span>
+      </div>`:''}
+    </div>`;
+  body.appendChild(item);
+  setTimeout(() => item.classList.remove('change-item-new'), 800);
+  body.scrollTop = body.scrollHeight;
+}
+
+function cleanOut(t) {
+  if (!t||typeof t!=='string') return null;
+  let c = t.trim()
+    // Strip wrapping quotes/backticks
+    .replace(/^["'`]+|["'`]+$/g,'')
+    // Strip any opening line that ends with a colon and reads as a preamble sentence
+    // e.g. "Here is the reorganized skills section for a Data & Analytics role, prioritizing…:"
+    .replace(/^here['']?s\b[^:\n]{0,120}:\s*/i,'')
+    .replace(/^here\s+is\b[^:\n]{0,120}:\s*/i,'')
+    // Strip simpler preamble variants
+    .replace(/^(rewritten|output|result|enhanced|improved|updated|optimized)\s*(bullet|summary|headline|title|skills|section|version)?\s*[:\s]+/i,'')
+    .replace(/^(bullet|summary|headline|title|version|skills\s*section)\s*[:\s]+/i,'')
+    .replace(/^(here you go|here it is|sure|certainly|of course|below|as requested)[!,.\s]+/i,'')
+    // Strip trailing **Note:** / Note: blocks (markdown or plain)
+    .replace(/\n+\s*\*{0,2}note\*{0,2}[:\s].+$/is,'')
+    // Strip trailing parenthetical meta-commentary "(I've kept all original skills…)"
+    .replace(/\n+\s*\([^)]{15,}\)\s*$/,'')
+    // Strip trailing explanation lines ("I've kept… / I've added… / I've formatted…")
+    .replace(/\n+\s*i['']ve\s+(kept|added|formatted|included|maintained|reorganized|prioritized)[^.]*\.?\s*$/im,'')
+    .trim();
+  if (c.length<6||c.length>1200) return null;
+  return c;
+}
+
+// ═══════════════════════════════════════════
+//  STEP 1: ANALYZE JD — role, seniority, tone
+// ═══════════════════════════════════════════
+async function analyzeJD(jdText) {
+  const sys = `You are a talent analyst. Analyze job descriptions and respond in exact format requested. Be concise and accurate.`;
+  const usr = `Analyze this job description. Reply in EXACTLY this format, no other text:
+
+ROLE: [one of: Software Engineering | Data & Analytics | Machine Learning & AI | Product Management | Leadership & Management | DevOps & Infrastructure | Design & Creative | Sales & Business | Research & Science | Finance & Accounting]
+SENIORITY: [one of: Entry-Level | Mid-Level | Senior | Lead/Staff | Director | VP/Executive]
+TONE: [exactly 3 comma-separated adjectives, e.g.: innovative, results-driven, collaborative]
+VERBS: [5 strong action verbs suited to this role, comma-separated, e.g.: Architected, Spearheaded, Optimized]
+THEME: [core theme in 4 words, e.g.: scalable distributed AI systems]
+
+Job Description:
+${jdText.slice(0,2000)}`;
+
+  const result = await llm(sys, usr, 160);
+  return parseRoleAnalysis(result, jdText);
+}
+
+function parseRoleAnalysis(text, jdFallback) {
+  const get = (key) => {
+    if (!text) return null;
+    const m = text.match(new RegExp(key+'[:\\s]+(.+)', 'i'));
+    return m ? m[1].trim() : null;
+  };
+
+  // Fallback role detection via keyword scan
+  const jd = jdFallback.toLowerCase();
+  let roleType = get('ROLE') || 'Software Engineering';
+  if (!get('ROLE')) {
+    if (/\b(ml|machine learning|deep learning|llm|ai|neural|model|pytorch|tensorflow)\b/.test(jd)) roleType='Machine Learning & AI';
+    else if (/\b(data|analytics|sql|pipeline|warehouse|spark|dbt|etl)\b/.test(jd)) roleType='Data & Analytics';
+    else if (/\b(product manager|pm|roadmap|stakeholder|go-to-market)\b/.test(jd)) roleType='Product Management';
+    else if (/\b(director|vp|head of|cto|ceo|lead team|manage team)\b/.test(jd)) roleType='Leadership & Management';
+    else if (/\b(devops|kubernetes|docker|sre|infrastructure|ci\/cd|terraform)\b/.test(jd)) roleType='DevOps & Infrastructure';
+    else if (/\b(design|figma|ux|ui|creative|brand|visual)\b/.test(jd)) roleType='Design & Creative';
+    else if (/\b(sales|revenue|account|crm|quota|b2b|pipeline)\b/.test(jd)) roleType='Sales & Business';
+    else if (/\b(research|phd|paper|publication|experiment|study)\b/.test(jd)) roleType='Research & Science';
+  }
+
+  let seniority = get('SENIORITY') || 'Senior';
+  if (!get('SENIORITY')) {
+    if (/\b(entry|junior|graduate|intern|0-2 years?)\b/.test(jd)) seniority='Entry-Level';
+    else if (/\b(mid.?level|2-4 years?|3-5 years?)\b/.test(jd)) seniority='Mid-Level';
+    else if (/\b(senior|sr\.?|5\+|7\+ years?)\b/.test(jd)) seniority='Senior';
+    else if (/\b(lead|staff|principal|architect)\b/.test(jd)) seniority='Lead/Staff';
+    else if (/\b(director|head of)\b/.test(jd)) seniority='Director';
+    else if (/\b(vp|vice president|cto|ceo|c-suite)\b/.test(jd)) seniority='VP/Executive';
+  }
+
+  // Default tones per role
+  const ROLE_TONES = {
+    'Software Engineering':['precision-focused','solution-oriented','technically rigorous'],
+    'Data & Analytics':['data-driven','analytical','insight-focused'],
+    'Machine Learning & AI':['innovative','research-oriented','technically advanced'],
+    'Product Management':['strategic','user-centric','cross-functional'],
+    'Leadership & Management':['visionary','results-oriented','team-empowering'],
+    'DevOps & Infrastructure':['reliability-focused','automation-driven','scalability-minded'],
+    'Design & Creative':['user-empathetic','creative','detail-oriented'],
+    'Sales & Business':['revenue-focused','relationship-driven','growth-oriented'],
+    'Research & Science':['methodical','evidence-based','intellectually rigorous'],
+    'Finance & Accounting':['accuracy-focused','compliance-aware','analytical'],
+  };
+
+  // Default verbs per role
+  const ROLE_VERBS = {
+    'Software Engineering':['Architected','Engineered','Implemented','Optimized','Delivered'],
+    'Data & Analytics':['Analyzed','Modeled','Quantified','Automated','Uncovered'],
+    'Machine Learning & AI':['Developed','Fine-tuned','Deployed','Pioneered','Benchmarked'],
+    'Product Management':['Spearheaded','Launched','Prioritized','Orchestrated','Drove'],
+    'Leadership & Management':['Led','Mentored','Directed','Championed','Scaled'],
+    'DevOps & Infrastructure':['Automated','Deployed','Hardened','Streamlined','Provisioned'],
+    'Design & Creative':['Designed','Crafted','Researched','Prototyped','Elevated'],
+    'Sales & Business':['Generated','Grew','Secured','Negotiated','Accelerated'],
+    'Research & Science':['Investigated','Published','Validated','Quantified','Discovered'],
+    'Finance & Accounting':['Managed','Reconciled','Forecasted','Optimized','Reported'],
+  };
+
+  const rawTone = get('TONE');
+  const tone = rawTone
+    ? rawTone.split(',').map(t=>t.trim()).filter(Boolean).slice(0,3)
+    : (ROLE_TONES[roleType] || ['professional','results-driven','collaborative']);
+
+  const rawVerbs = get('VERBS');
+  const verbs = rawVerbs
+    ? rawVerbs.split(',').map(v=>v.trim()).filter(Boolean).slice(0,5)
+    : (ROLE_VERBS[roleType] || ['Led','Built','Delivered','Improved','Designed']);
+
+  const theme = get('THEME') || 'high-impact professional work';
+
+  return { type:roleType, seniority, tone, verbs, theme };
+}
+
+// ═══════════════════════════════════════════
+//  STEP 2: REWRITE SUMMARY — tone-aware
+// ═══════════════════════════════════════════
+async function rewriteSummary(origText, roleAnalysis, keywords, onToken=null) {
+  const { type, seniority, tone, theme } = roleAnalysis;
+  const kwStr = keywords.slice(0,10).join(', ');
+  const toneStr = tone.join(', ');
+  const sys = `You are a world-class resume writer specializing in ${type} roles. Output ONLY the rewritten summary text — no intro like "Here is the rewritten summary:", no notes, no explanation.`;
+  const usr = `Rewrite this professional summary for a ${seniority} ${type} position.
+
+Target tone: ${toneStr}
+Role theme: ${theme}
+Keywords to weave in naturally: ${kwStr}
+
+Original summary:
+"${origText}"
+
+Requirements:
+- Open with a powerful positioning statement for ${seniority} level
+- Match the ${toneStr} tone throughout
+- Embed 4-6 keywords naturally — not as a list, but woven into sentences
+- 3-5 sentences, no bullet points
+- No clichés like "passionate professional" or "team player"
+- Be specific, confident, direct
+- Output ONLY the rewritten summary text`;
+  return await llm(sys, usr, 350, onToken);
+}
+
+// ═══════════════════════════════════════════
+//  STEP 3: REWRITE BULLET — duty → achievement
+// ═══════════════════════════════════════════
+async function rewriteBullet(origLine, roleAnalysis, relevantKws, isWeak, onToken=null) {
+  const { type, seniority, tone, verbs } = roleAnalysis;
+  const kwStr = relevantKws.slice(0,5).join(', ');
+  const verbStr = verbs.join(', ');
+  const toneStr = tone.slice(0,2).join(' and ');
+  const sys = `You are a professional resume writer for ${type} roles. Output ONLY the rewritten bullet — no intro, no "Here's the rewritten bullet:", no notes, no explanation.`;
+  const usr = `Transform this resume bullet for a ${seniority} ${type} role.
+
+Preferred action verbs for this role: ${verbStr}
+Tone: ${toneStr}
+Keywords to embed if genuinely relevant: ${kwStr}
+
+Original bullet:
+"${origLine}"
+
+Requirements:
+${isWeak?'- This bullet is duty-based ("Responsible for…", "Worked on…") — transform it into an ACHIEVEMENT statement\n':''}
+- Start with a strong verb from the preferred list if it fits naturally
+- If no metrics exist, add a realistic placeholder like [X%], [N+ users], [$XK], [N team members]
+- Maximum 2 lines
+- Only embed keywords that genuinely fit the described work
+- Avoid: "Responsible for", "Worked on", "Helped with", "Involved in", "Assisted"
+- Output ONLY the rewritten bullet, no preamble`;
+  return await llm(sys, usr, 220, onToken);
+}
+
+// ═══════════════════════════════════════════
+//  STEP 4: PROFESSIONAL HEADLINE
+// ═══════════════════════════════════════════
+async function suggestHeadline(currentName, currentTitle, roleAnalysis, topKeywords, onToken=null) {
+  const { type, seniority, theme } = roleAnalysis;
+  const kws = topKeywords.slice(0,6).join(', ');
+  const sys = `You are a personal branding expert. Create concise, powerful professional headlines for resumes.`;
+  const usr = `Suggest a professional headline/title for a ${seniority} ${type} role.
+
+Current title (if any): ${currentTitle||'none'}
+Key expertise areas: ${kws}
+Role theme: ${theme}
+
+Requirements:
+- 5-10 words maximum
+- Specific, not generic (not just "Senior Software Engineer")
+- Incorporate 1-2 key specializations from the expertise list
+- Example format: "Senior ML Engineer · LLM Systems & RAG Pipelines"
+- Output ONLY the headline text, nothing else`;
+  return await llm(sys, usr, 60, onToken);
+}
+
+// ═══════════════════════════════════════════
+//  STEP 5: SKILLS REORDER
+// ═══════════════════════════════════════════
+async function reorderSkills(skillsLines, roleAnalysis, jdKeywords, onToken=null) {
+  if (!skillsLines.length) return skillsLines;
+  const { type, theme } = roleAnalysis;
+  const topKws = jdKeywords.slice(0,15).join(', ');
+  const allSkills = skillsLines.join('\n');
+  const sys = `You are a resume expert. Output ONLY the reorganized skills content — no introduction, no explanation, no notes.`;
+  const usr = `Reorganize this skills section for a ${type} role. Output the skills directly with no preamble, no "Here is...", no notes.
+
+Most important keywords for this role: ${topKws}
+Role theme: ${theme}
+
+Current skills:
+${allSkills}
+
+Rules:
+- Output EXACTLY 2-4 lines total, no more
+- Each line: "Category: skill1, skill2, skill3" — one line per category, no duplicates
+- Do NOT repeat any line or skill
+- Do NOT output the same category more than once
+- Put the most JD-relevant skills FIRST
+- Keep ALL original skills; add critical missing ones from the keyword list
+- DO NOT write any intro sentence, explanation, or note — start immediately with the first category`;
+  const result = await llm(sys, usr, 220, onToken);
+  if (!result) return skillsLines;
+
+  // Post-process: deduplicate lines and strip junk
+  const lines = result.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  const seen = new Set();
+  const cleaned = [];
+  for (const line of lines) {
+    // Skip lines that look like raw keyword dumps (no colon = no category label)
+    // and lines that are near-duplicates of already-seen ones
+    const key = line.toLowerCase().replace(/\s+/g,'');
+    if (seen.has(key)) continue;
+    // Skip lines that are just a handful of bare words with no category structure
+    // (e.g. "payments | sql | must | type") — valid lines have a "Word: ..." pattern
+    const hasCategory = /^[A-Za-z][^:]{1,30}:/.test(line);
+    const isPipeOnly = !hasCategory && line.split('|').length > 2;
+    if (isPipeOnly && cleaned.length > 0) continue; // junk at end
+    seen.add(key);
+    cleaned.push(line);
+    if (cleaned.length >= 5) break; // hard cap
+  }
+  return cleaned.length > 0 ? cleaned : skillsLines;
+}
+
+// ═══════════════════════════════════════════
+//  WEAK BULLET DETECTION
+// ═══════════════════════════════════════════
+const WEAK_STARTS = /^(responsible for|worked on|helped|assisted|supported|involved in|tasked with|duties include|role was|part of)/i;
+const DUTY_PHRASES = /\b(was responsible|was in charge|worked alongside|helped to|assisted in)\b/i;
+
+function isWeakBullet(line) {
+  const t = line.trim();
+  return WEAK_STARTS.test(t) || DUTY_PHRASES.test(t);
+}
+
+// ═══════════════════════════════════════════
+//  FILL-IN PLACEHOLDER HIGHLIGHTER
+// ═══════════════════════════════════════════
+function markFillIns(html) {
+  // Detect [X%], [$XK], [N+ users], [X team members] etc.
+  return html.replace(/\[([\w\d\s%+$.,]+?)\]/g, (match, inner) => {
+    const clean = inner.trim();
+    return `<span class="fill" title="Fill in your actual metric" onclick="this.contentEditable='true';this.focus()">[${clean}]</span>`;
+  });
+}
+
+// ═══════════════════════════════════════════
+//  MAIN LLM OPTIMIZATION PIPELINE
+// ═══════════════════════════════════════════
+async function optimizeWithLLM(sections, jdKeywords, missing, jdText) {
+  const result = JSON.parse(JSON.stringify(sections));
+  S.changelog = [];
+  let addedSet = new Set();
+
+  // ── Step 0: Parse — show original CV in preview immediately ──
+  setPStep(0,'active');
+  const topKw = missing.slice(0,14);
+  renderLivePreview(result, addedSet); // Show original right away
+  await delay(200);
+  setPStep(0,'done');
+
+  // ── Step 1: Role analysis ──
+  setPStep(1,'active');
+  showStream('🔍 Detecting role, seniority & tone from JD…');
+  let roleAnalysis = S.roleAnalysis;
+  if (!roleAnalysis || roleAnalysis.type === 'Analyzing…') {
+    roleAnalysis = await analyzeJD(jdText);
+  }
+  if (!roleAnalysis) roleAnalysis = parseRoleAnalysis(null, jdText);
+  S.roleAnalysis = roleAnalysis;
+  updateRoleDisplay(roleAnalysis);
+  hideStream();
+  setPStep(1,'done');
+
+  // ── Step 2: Summary ──
+  setPStep(2,'active');
+  const sumKey = Object.keys(result).find(k=>['summary','objective','profile','about'].includes(k));
+  if (sumKey && result[sumKey].length > 0) {
+    const origText = result[sumKey].filter(l=>l.trim()).join(' ');
+    if (origText.length > 20) {
+      showStream('✍️ Rewriting Professional Summary with ' + (roleAnalysis.tone[0]||'professional') + ' tone…');
+      const rewritten = await rewriteSummary(origText, roleAnalysis, topKw, updateStream);
+      hideStream();
+      if (rewritten) {
+        const origShort = origText.length>80?origText.slice(0,77)+'…':origText;
+        const newShort  = rewritten.length>80?rewritten.slice(0,77)+'…':rewritten;
+        result[sumKey] = [rewritten];
+        topKw.forEach(kw=>{ if(rewritten.toLowerCase().includes(kw.toLowerCase())) addedSet.add(kw); });
+        renderLivePreview(result, addedSet); // Live update preview ✨
+        const card = { icon:'ci-summary', cat:'Summary', title:'Rewritten with tone adaptation',
+          detail:`Tone matched to ${roleAnalysis.type} · ${roleAnalysis.seniority}`,
+          before:origShort, after:newShort };
+        S.changelog.push(card);
+        appendChangeCard(card); // Live changelog ✨
+      }
+    }
+  } else if (!sumKey) {
+    const matchStr = S.matched.slice(0,4).join(', ');
+    const missStr  = topKw.slice(0,3).join(', ');
+    const newSum = `${roleAnalysis.seniority} ${roleAnalysis.type} professional with deep expertise in ${matchStr||'core domain skills'}, bringing proven experience with ${missStr}. ${roleAnalysis.tone[0]||'Results-driven'} and focused on ${roleAnalysis.theme}.`;
+    result['summary'] = [newSum];
+    topKw.slice(0,3).forEach(k=>addedSet.add(k));
+    renderLivePreview(result, addedSet);
+    const card = { icon:'ci-summary', cat:'Summary', title:'Created new Professional Summary',
+      detail:'No summary found in original CV — generated role-tailored one', before:'(none)', after:newSum.slice(0,80)+'…' };
+    S.changelog.push(card);
+    appendChangeCard(card);
+  }
+  setPStep(2,'done');
+
+  // ── Step 3: Experience bullets ──
+  setPStep(3,'active');
+  const expKey = Object.keys(result).find(k=>
+    ['experience','work experience','employment','professional experience','work history'].includes(k)
+  );
+  if (expKey && result[expKey].length > 0) {
+    const stillMissing = topKw.filter(kw=>!addedSet.has(kw));
+    let rewrote=0, bulletIdx=0;
+    for (let i=0; i<result[expKey].length && rewrote<8; i++) {
+      const line = result[expKey][i];
+      if (!line||line.trim().length<20) continue;
+      if (/\d{4}/.test(line)&&line.trim().length<70) continue;
+      const weak = isWeakBullet(line);
+      const relevKws = stillMissing.filter(kw=>!line.toLowerCase().includes(kw.toLowerCase())).slice(0,5);
+      if (!weak && !relevKws.length) continue;
+      bulletIdx++;
+      showStream(`⚡ Rewriting bullet ${bulletIdx} — transforming ${weak?'duty→achievement':'to embed keywords'}…`);
+      const rewritten = await rewriteBullet(line, roleAnalysis, relevKws, weak, updateStream);
+      hideStream();
+      if (rewritten && rewritten.length>15 && rewritten.length<500) {
+        const origShort=line.length>70?line.slice(0,67)+'…':line;
+        const newShort=rewritten.length>70?rewritten.slice(0,67)+'…':rewritten;
+        result[expKey][i] = rewritten;
+        relevKws.forEach(kw=>{ if(rewritten.toLowerCase().includes(kw.toLowerCase())) addedSet.add(kw); });
+        renderLivePreview(result, addedSet); // Live update preview ✨
+        const card = { icon:'ci-bullet', cat:'Experience',
+          title: weak?'Transformed duty→achievement':'Enhanced with keywords & stronger verb',
+          detail:`Embedded ${relevKws.filter(k=>rewritten.toLowerCase().includes(k.toLowerCase())).length} keywords · Added metrics placeholder`,
+          before:origShort, after:newShort };
+        S.changelog.push(card);
+        appendChangeCard(card); // Live changelog ✨
+        rewrote++;
+      }
+    }
+  }
+  setPStep(3,'done');
+
+  // ── Step 4: Skills reorder ──
+  setPStep(4,'active');
+  const skillKey = Object.keys(result).find(k=>
+    ['skills','technical skills','core competencies','competencies','technologies'].includes(k)
+  );
+  const stillMissing2 = topKw.filter(kw=>!addedSet.has(kw));
+
+  if (skillKey && result[skillKey].length > 0) {
+    showStream('🛠️ Reorganizing skills by role relevance…');
+    const reorderedLines = await reorderSkills(result[skillKey], roleAnalysis, jdKeywords, updateStream);
+    hideStream();
+    if (reorderedLines && reorderedLines.length > 0) {
+      const existing = reorderedLines.join(' ').toLowerCase();
+      const toAdd = stillMissing2.filter(k=>!existing.includes(k.toLowerCase())).slice(0,10);
+      const finalLines = [...reorderedLines];
+      if (toAdd.length > 0) { finalLines.push(toAdd.join(' | ')); toAdd.forEach(k=>addedSet.add(k)); }
+      result[skillKey] = finalLines;
+      renderLivePreview(result, addedSet); // Live update preview ✨
+      const card = { icon:'ci-skill', cat:'Skills', title:'Reordered by role relevance',
+        detail:`Grouped into categories · ${toAdd.length} additional keywords added`,
+        before:'(original order)', after:`${roleAnalysis.type}-optimized groupings` };
+      S.changelog.push(card);
+      appendChangeCard(card);
+    }
+  } else {
+    const toAdd = topKw.filter(k=>!addedSet.has(k));
+    result['skills'] = [toAdd.join(' | ')];
+    toAdd.forEach(k=>addedSet.add(k));
+    renderLivePreview(result, addedSet);
+    const card = { icon:'ci-skill', cat:'Skills', title:'Created Skills section',
+      detail:`Added ${toAdd.length} role-relevant keywords`, before:'(none)', after:toAdd.slice(0,5).join(', ')+'…' };
+    S.changelog.push(card);
+    appendChangeCard(card);
+  }
+  setPStep(4,'done');
+
+  // ── Step 5: Headline ──
+  setPStep(5,'active');
+  const headerLines = result['header'] || [];
+  const currentTitle = headerLines.find(l=>l.length>5&&l.length<80&&!l.includes('@')&&!l.match(/^\+?\d/));
+  showStream('🏷️ Generating targeted professional headline…');
+  const headline = await suggestHeadline('', currentTitle, roleAnalysis, jdKeywords, updateStream);
+  hideStream();
+  if (headline && headline.length > 5) {
+    const header = result['header'] || [];
+    const nameIdx = header.findIndex(l=>l.trim().length>3&&!l.includes('@')&&!l.match(/^\+\d/));
+    if (nameIdx>=0) {
+      const existTitleIdx = header.findIndex((l,i)=>i>nameIdx&&l.length>5&&l.length<80&&!l.includes('@')&&!l.match(/^\+\d/));
+      if (existTitleIdx>=0) {
+        const oldTitle = header[existTitleIdx];
+        header[existTitleIdx] = headline;
+        const card = { icon:'ci-title', cat:'Headline', title:'Updated professional title', detail:'', before:oldTitle, after:headline };
+        S.changelog.push(card);
+        appendChangeCard(card);
+      } else {
+        header.splice(nameIdx+1, 0, headline);
+        const card = { icon:'ci-title', cat:'Headline', title:'Added targeted professional headline', detail:'', before:'(none)', after:headline };
+        S.changelog.push(card);
+        appendChangeCard(card);
+      }
+      result['header'] = header;
+      renderLivePreview(result, addedSet); // Live update preview ✨
+    }
+  }
+  setPStep(5,'done');
+
+  S.addedKeywords = [...addedSet];
+  return result;
+}
+
+// ═══════════════════════════════════════════
+//  RULE-BASED FALLBACK
+// ═══════════════════════════════════════════
+function optimizeRuleBased(sections, missing) {
+  const result = JSON.parse(JSON.stringify(sections));
+  S.changelog = [];
+  const addedSet = new Set();
+  const topKw = missing.slice(0,15);
+  const role = S.roleAnalysis || { type:'Professional', seniority:'Senior', tone:['results-driven'] };
+
+  // Skills
+  const sk=Object.keys(result).find(k=>['skills','technical skills','core competencies','competencies','technologies'].includes(k));
+  if (sk) {
+    const ex=result[sk].join(' ').toLowerCase();
+    const toAdd=topKw.filter(k=>!ex.includes(k.toLowerCase()));
+    if(toAdd.length){result[sk].push(toAdd.join(' | '));toAdd.forEach(k=>addedSet.add(k));}
+    S.changelog.push({icon:'ci-skill',cat:'Skills',title:'Added missing keywords to Skills',
+      before:'Original order',after:toAdd.slice(0,4).join(', ')+'…'});
+  } else if(topKw.length){
+    result['skills']=[topKw.join(' | ')];
+    topKw.forEach(k=>addedSet.add(k));
+  }
+
+  // Summary
+  const su=Object.keys(result).find(k=>['summary','objective','profile','about'].includes(k));
+  const top5=topKw.slice(0,5);
+  if(su&&result[su].length){
+    const st=result[su].join(' ').toLowerCase();
+    const toAdd=top5.filter(k=>!st.includes(k.toLowerCase()));
+    if(toAdd.length){
+      result[su].push(`Experienced with ${toAdd.slice(0,3).join(', ')}${toAdd.length>3?' and '+toAdd[3]:''}.`);
+      toAdd.forEach(k=>addedSet.add(k));
+      S.changelog.push({icon:'ci-summary',cat:'Summary',title:'Appended missing keywords',
+        before:'(original)',after:'Added '+toAdd.slice(0,3).join(', ')});
+    }
+  } else if(!su&&top5.length){
+    const kStr=S.matched.slice(0,3).join(', ');
+    result['summary']=[`Results-driven ${role.seniority} ${role.type} professional with expertise in ${kStr||'key domain skills'} and experience with ${top5.slice(0,3).join(', ')}.`];
+    top5.slice(0,3).forEach(k=>addedSet.add(k));
+    S.changelog.push({icon:'ci-summary',cat:'Summary',title:'Created Professional Summary',
+      before:'(none)',after:'Generated role-targeted summary'});
+  }
+
+  S.addedKeywords=[...addedSet];
+  return result;
+}
+
+// ═══════════════════════════════════════════
+//  PROCESSING STEPS UI
+// ═══════════════════════════════════════════
+const TICK=`<svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+const SPIN_I=`<svg class="ps-icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin .8s linear infinite"><path d="M21 12a9 9 0 1 1-2.1-5.5"/></svg>`;
+
+function setPStep(i, state) {
+  const el=document.getElementById('ps'+i); if(!el) return;
+  const svg=el.querySelector('svg'); if(!svg) return;
+  if(state==='active'){el.className='proc-step active';svg.outerHTML=SPIN_I;}
+  else if(state==='done'){el.className='proc-step done';el.querySelector('svg').outerHTML=TICK;}
+}
+
+// ═══════════════════════════════════════════
+//  HTML BUILDER
+// ═══════════════════════════════════════════
+const SEC_ORDER=[
+  {keys:['header'],        title:null},
+  {keys:['summary'],       title:'Professional Summary'},
+  {keys:['skills'],        title:'Skills'},
+  {keys:['experience'],    title:'Experience'},
+  {keys:['education'],     title:'Education'},
+  {keys:['projects'],      title:'Projects'},
+  {keys:['certifications'],title:'Certifications'},
+  {keys:['achievements'],  title:'Achievements'},
+  {keys:['publications'],  title:'Publications'},
+  {keys:['languages'],     title:'Languages'},
+  {keys:['interests'],     title:'Interests'},
+  {keys:['volunteer'],     title:'Volunteer Experience'},
+];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ── Word-level diff: find the best-matching original line ──
+function bestOrigMatch(newLine, origLines) {
+  if (!origLines || !origLines.length) return { line: '', score: 0 };
+  const nw = new Set(newLine.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z0-9]/g,'')).filter(w=>w.length>1));
+  let best='', bestScore=0;
+  for (const orig of origLines) {
+    if (!orig.trim()) continue;
+    const ow = orig.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z0-9]/g,'')).filter(w=>w.length>1);
+    const overlap = ow.filter(w=>nw.has(w)).length;
+    const score = overlap / Math.max(nw.size, ow.length, 1);
+    if (score > bestScore) { bestScore = score; best = orig; }
+  }
+  return { line: best, score: bestScore };
+}
+
+// ── Highlight ALL changed words compared to corresponding original line ──
+function diffHighlight(newLine, origLines) {
+  const { line: origLine, score } = bestOrigMatch(newLine, origLines);
+  // If no original line at all → entire line is new, highlight fully
+  if (!origLine) return `<mark>${esc(newLine)}</mark>`;
+
+  // Build a Set of normalised words from the best-matching original line
+  const origWords = new Set(
+    origLine.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z0-9]/g,''))
+  );
+
+  // Tokenise new line preserving spaces so we can rebuild the string
+  const tokens = newLine.split(/(\s+)/);
+  let html = '', inMark = false;
+
+  for (const tok of tokens) {
+    if (/^\s+$/.test(tok)) {           // whitespace — never highlighted
+      html += inMark ? '</mark>' + esc(tok) : esc(tok);
+      inMark = false;
+      continue;
+    }
+    const clean = tok.toLowerCase().replace(/[^a-z0-9]/g,'');
+    // Highlight if the word is meaningful AND wasn't in the original
+    const isNew = clean.length > 2 && !origWords.has(clean);
+    if (isNew && !inMark)       { html += '<mark>' + esc(tok); inMark = true; }
+    else if (!isNew && inMark)  { html += '</mark>' + esc(tok); inMark = false; }
+    else                          html += esc(tok);
+  }
+  if (inMark) html += '</mark>';
+  return html;
+}
+
+function renderLine(line, addedSet, isSkills, origLines=null) {
+  if(!line.trim()) return '<br>';
+  const isBullet = /^[\u2022\u2023\u25E6\u2043\-\*]\s/.test(line);
+  const text = isBullet ? line.replace(/^[\u2022\u2023\u25E6\u2043\-\*]\s*/,'') : line;
+  // Use diff-based highlighting if we have original lines; else keyword-only
+  const highlighted = origLines !== null ? diffHighlight(text, origLines) : esc(text);
+  return isBullet ? `<div class="bullet">${highlighted}</div>` : `<p>${highlighted}</p>`;
+}
+
+function buildHTML(sections, addedSet, origSections=null) {
+  let html='';
+  const used=new Set();
+  for(const{keys,title}of SEC_ORDER){
+    const k=keys.find(k=>sections[k]?.length>0); if(!k) continue;
+    used.add(k);
+    const isSkills=['skills','technologies','competencies'].includes(k);
+    // Pass original lines for diff (skip header — name/contact never change)
+    const origLines = (origSections && k !== 'header') ? (origSections[k] || null) : null;
+    if(k==='header'){
+      let first=true;
+      for(const l of sections[k]){
+        if(!l.trim()) continue;
+        if(first){html+=`<h1>${esc(l)}</h1>\n`;first=false;}
+        else html+=`<p class="cl">${esc(l)}</p>\n`;
+      }
+      continue;
+    }
+    html+=`<h2>${esc(title)}</h2>\n`;
+    sections[k].forEach(l=>{html+=renderLine(l,addedSet,isSkills,origLines)+'\n';});
+  }
+  for(const k of Object.keys(sections)){
+    if(used.has(k)||!sections[k]?.length) continue;
+    html+=`<h2>${esc(k.charAt(0).toUpperCase()+k.slice(1))}</h2>\n`;
+    const origLines = origSections ? (origSections[k] || null) : null;
+    sections[k].forEach(l=>{html+=renderLine(l,new Set(),false,origLines)+'\n';});
+  }
+  return html;
+}
+
+// ═══════════════════════════════════════════
+//  CHANGE LOG UI
+// ═══════════════════════════════════════════
+function renderChangelog() {
+  const log=S.changelog; if(!log.length) return;
+  const wrap=document.getElementById('changelogWrap');
+  const body=document.getElementById('changelogBody');
+  const badge=document.getElementById('changeCountBadge');
+  badge.textContent=log.length;
+  body.innerHTML=log.map(c=>`
+    <div class="change-item">
+      <div class="change-item-icon ${c.icon}">
+        ${c.icon==='ci-summary'?'✍️':c.icon==='ci-bullet'?'⚡':c.icon==='ci-tone'?'🎨':c.icon==='ci-skill'?'🛠️':'🏷️'}
+      </div>
+      <div class="change-item-text">
+        <strong>${esc(c.cat)}: ${esc(c.title)}</strong>
+        <span>${esc(c.detail||'')}</span>
+        ${c.before&&c.after?`<div class="before-after mt-4">
+          <span class="ba-before">Before: ${esc(c.before.slice(0,60))}${c.before.length>60?'…':''}</span>
+          <span class="ba-after">After: ${esc(c.after.slice(0,60))}${c.after.length>60?'…':''}</span>
+        </div>`:''}
+      </div>
+    </div>`).join('');
+  wrap.style.display='block';
+}
+
+function toggleChangelog() {
+  const b=document.getElementById('changelogBody');
+  const ch=document.getElementById('clChevron');
+  b.classList.toggle('open');
+  ch.style.transform=b.classList.contains('open')?'rotate(180deg)':'';
+}
+
+// ═══════════════════════════════════════════
+//  BEFORE/AFTER TOGGLE
+// ═══════════════════════════════════════════
+function showVersion(which) {
+  const preview=document.getElementById('resumePreview');
+  document.getElementById('btnViewOptimized').classList.toggle('active',which==='optimized');
+  document.getElementById('btnViewOriginal').classList.toggle('active',which==='original');
+  if(which==='original'){
+    preview.innerHTML=S.originalHTML;
+    preview.contentEditable='false';
+  } else {
+    const addedSet=new Set(S.addedKeywords);
+    const html=buildHTML(S.optimizedSections, addedSet);
+    preview.innerHTML=markFillIns(html);
+    preview.contentEditable='false';
+  }
+}
+
+function makeEditable() {
+  const p=document.getElementById('resumePreview');
+  p.contentEditable='true';p.focus();
+  document.getElementById('btnMakeEditable').style.display='none';
+}
+
+// ═══════════════════════════════════════════
+//  KEYWORDS + SECTION PARSER
+// ═══════════════════════════════════════════
+const TECH_DICT=new Set(['python','javascript','typescript','java','kotlin','swift','golang','go','rust','c++','c#','ruby','php','scala','r','matlab','bash','powershell','dart','react','angular','vue','svelte','nextjs','next.js','nuxt','express','fastapi','flask','django','spring','laravel','html','css','tailwind','bootstrap','redux','graphql','nodejs','node.js','postgresql','mysql','sqlite','mongodb','redis','elasticsearch','cassandra','dynamodb','snowflake','bigquery','redshift','databricks','hive','clickhouse','pinecone','weaviate','chromadb','firebase','supabase','aws','azure','gcp','ec2','s3','lambda','eks','kubernetes','docker','terraform','ansible','helm','argocd','jenkins','github actions','gitlab ci','grafana','prometheus','datadog','splunk','elk','kibana','spark','hadoop','kafka','airflow','dbt','prefect','dagster','flink','tableau','power bi','looker','superset','pandas','numpy','scipy','matplotlib','plotly','streamlit','tensorflow','pytorch','keras','scikit-learn','sklearn','xgboost','lightgbm','hugging face','transformers','bert','gpt','llm','langchain','llamaindex','openai','anthropic','rag','embeddings','fine-tuning','prompt engineering','mlflow','kubeflow','generative ai','agentic ai','nlp','computer vision','deep learning','machine learning','reinforcement learning','a/b testing','rest','restful','grpc','websocket','oauth','jwt','microservices','event-driven','serverless','agile','scrum','kanban','devops','mlops','tdd','bdd','ci/cd','six sigma','git','github','gitlab','jira','confluence','figma','dspy','costar','guardrails','quantization','vllm','ollama']);
+const MULTI_PH=['machine learning','deep learning','natural language processing','computer vision','generative ai','agentic ai','large language model','prompt engineering','data science','data engineering','data analysis','data visualization','business intelligence','cross-functional','full stack','front end','back end','cloud computing','ci/cd','continuous integration','agile methodology','a/b testing','statistical analysis','six sigma','power bi','google cloud platform','amazon web services','microsoft azure','github actions'];
+const GEN_STOP=new Set(['analytics','business','product','reporting','insight','insights','technology','services','quality','management','server','manager','work','working','years','experience','skills','ability','knowledge','strong','good','great','excellent','responsibilities','requirements','required','preferred','qualifications','opportunity','candidate','position','role','company','team','join','using','used','plus','minimum','ideal','proven','track','record','help','support','provide','deliver','ensure','maintain','develop','build','create','manage','implement','improve','achieve','tools','solution','solutions','systems','system','platform','frameworks','approach','performance','results','impact','goals','objectives','initiatives','collaboration','communication','leadership','analytical','problem','solving','thinking','detail','deadline','large','small','multiple','various','different','new','existing','current','day','time','daily','weekly','year','month','key','main','core','primary','additional','high','low','medium','senior','junior','mid','entry','lead','staff','full','part','remote','hybrid','onsite','global','local']);
+
+function extractKeywords(text) {
+  const lower=text.toLowerCase(); const found=new Set();
+  for(const ph of MULTI_PH){if([ph,ph.replace(/\s/g,'-')].some(v=>lower.includes(v)))found.add(ph);}
+  for(const kw of TECH_DICT){
+    const esc=kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    if(new RegExp('(?<![a-z])'+esc+'(?![a-z])','i').test(text))found.add(kw);
+  }
+  const tokens=text.split(/[\s,;:()\[\]{}"']+/).filter(Boolean);
+  const freq={};
+  for(const tok of tokens){
+    const t=tok.replace(/[.!?]+$/,''); if(t.length<2) continue;
+    const lw=t.toLowerCase(); if(GEN_STOP.has(lw)) continue;
+    const isAcr=t===t.toUpperCase()&&t.length>=2&&t.length<=8&&/^[A-Z]/.test(t);
+    const isCap=/^[A-Z][a-z]/.test(t)&&t.length>3;
+    const hasTech=/[#+\.\/]/.test(t)&&t.length>1;
+    if(isAcr||isCap||hasTech) freq[lw]=(freq[lw]||0)+1;
+  }
+  for(const[w,cnt]of Object.entries(freq)) if(cnt>=2&&!GEN_STOP.has(w))found.add(w);
+  return[...found].slice(0,60);
+}
+
+function analyzeMatchFn(cvText, kws) {
+  const cvLow=cvText.toLowerCase(); const matched=[],missing=[];
+  for(const kw of kws){
+    const vars=[kw,kw.replace(/\s/g,'-'),kw.replace(/-/g,' '),kw.replace(/\s/g,'')];
+    if(vars.some(v=>cvLow.includes(v.toLowerCase())))matched.push(kw); else missing.push(kw);
+  }
+  return{matched,missing};
+}
+
+const SEC_PATS=[
+  {re:/^(professional\s+)?(summary|overview|profile|objective|about(\s+me)?)$/i,key:'summary'},
+  {re:/^(work\s+)?(experience|history)$/i,key:'experience'},
+  {re:/^(professional\s+|relevant\s+)?experience$/i,key:'experience'},
+  {re:/^employment(\s+history)?$/i,key:'experience'},
+  {re:/^education(\s+background)?$/i,key:'education'},
+  {re:/^academic(\s+background|s)?$/i,key:'education'},
+  {re:/^(technical\s+|core\s+)?skills?$/i,key:'skills'},
+  {re:/^(core\s+)?competencies$/i,key:'skills'},
+  {re:/^technologies(\s+[&+]\s+tools?)?$/i,key:'skills'},
+  {re:/^tools?\s*[&+]?\s*technologies?$/i,key:'skills'},
+  {re:/^(key\s+)?projects?$/i,key:'projects'},
+  {re:/^certifications?(\s+[&+]\s+awards?)?$/i,key:'certifications'},
+  {re:/^(key\s+)?achievements?$/i,key:'achievements'},
+  {re:/^accomplishments?$/i,key:'achievements'},
+  {re:/^awards?(\s+[&+]\s+recognition)?$/i,key:'achievements'},
+  {re:/^publications?$/i,key:'publications'},
+  {re:/^languages?$/i,key:'languages'},
+  {re:/^interests?$/i,key:'interests'},
+  {re:/^volunteer(ing|\s+experience)?$/i,key:'volunteer'},
+];
+
+function detectSec(line) {
+  if(!line||line.length>55) return null;
+  const clean=line.replace(/^[\s•\-_|:]+|[\s•\-_|:]+$/g,'').trim(); if(!clean) return null;
+  for(const{re,key}of SEC_PATS) if(re.test(clean)) return key;
+  if(clean===clean.toUpperCase()&&clean.length<40&&/[A-Z]/.test(clean)){
+    const low=clean.toLowerCase().replace(/\s+/g,' ');
+    for(const{re,key}of SEC_PATS) if(re.test(low)) return key;
+  }
+  return null;
+}
+
+function parseSections(text) {
+  const sections={header:[]};let cur='header';
+  for(const line of text.split('\n').map(l=>l.trim())){
+    const k=detectSec(line);
+    if(k){cur=k;if(!sections[cur])sections[cur]=[];}
+    else{if(!sections[cur])sections[cur]=[];sections[cur].push(line);}
+  }
+  for(const k of Object.keys(sections)){
+    while(sections[k].length&&!sections[k][0])sections[k].shift();
+    while(sections[k].length&&!sections[k][sections[k].length-1])sections[k].pop();
+  }
+  return sections;
+}
+
+// ═══════════════════════════════════════════
+//  PANEL NAVIGATION
+// ═══════════════════════════════════════════
+function goTo(n){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel'+n).classList.add('active');
+  document.querySelectorAll('.si').forEach(el=>{
+    const s=+el.dataset.step;
+    el.classList.toggle('active',s===n);el.classList.toggle('done',s<n);
+  });
+  ['sl12','sl23','sl34'].forEach((id,i)=>document.getElementById(id)?.classList.toggle('done',i<n-1));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function showSpin(m){document.getElementById('spinMsg').textContent=m;document.getElementById('spinner').classList.add('show')}
+function hideSpin(){document.getElementById('spinner').classList.remove('show')}
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function animCount(el,target,sfx='%'){
+  let c=0;const s=Math.max(1,Math.ceil(target/40));
+  const iv=setInterval(()=>{c=Math.min(c+s,target);el.textContent=c+sfx;if(c>=target)clearInterval(iv)},25);
+}
+function setRing(id,score){document.getElementById(id).style.strokeDashoffset=314-(score/100)*314;}
+
+// ═══════════════════════════════════════════
+//  ROLE DISPLAY
+// ═══════════════════════════════════════════
+function updateRoleDisplay(ra) {
+  if(!ra) return;
+  document.getElementById('rdType').textContent=ra.type;
+  document.getElementById('rdSenior').textContent=ra.seniority;
+  const tonePills=document.getElementById('rdTone');
+  tonePills.innerHTML=ra.tone.map(t=>`<span class="tone-pill">${esc(t)}</span>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  UPLOAD
+// ═══════════════════════════════════════════
+let cvOk=false,jdOk=false;
+document.getElementById('cvInput').addEventListener('change',async e=>{
+  const file=e.target.files[0]; if(!file) return;
+  showSpin('Reading your PDF…');
+  try{
+    S.cvText=await extractPdfText(file);
+    document.getElementById('cvName').textContent=file.name;
+    document.getElementById('cvBadge').style.display='inline-flex';
+    cvOk=true; checkRdy();
+  }catch(err){alert('Could not read PDF: '+err.message);}
+  hideSpin();
+});
+const zone=document.getElementById('cvZone');
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over')});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+zone.addEventListener('drop',e=>{
+  e.preventDefault();zone.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type==='application/pdf'){
+    const dt=new DataTransfer();dt.items.add(f);
+    const inp=document.getElementById('cvInput');inp.files=dt.files;inp.dispatchEvent(new Event('change'));
+  }
+});
+document.getElementById('jdInput').addEventListener('input',e=>{jdOk=e.target.value.trim().length>20;checkRdy();});
+function checkRdy(){document.getElementById('btnAnalyze').disabled=!(cvOk&&jdOk);}
+
+// ═══════════════════════════════════════════
+//  ANALYZE BUTTON
+// ═══════════════════════════════════════════
+let llmInitProm=null, skipLLM=false;
+
+document.getElementById('btnSkipLLM').addEventListener('click',()=>{
+  skipLLM=true; S.llmSkipped=true;
+  document.getElementById('llmModal').classList.remove('show');
+  proceedToAnalysis();
+});
+
+document.getElementById('btnAnalyze').addEventListener('click',async()=>{
+  S.jdText=document.getElementById('jdInput').value.trim();
+  showSpin('Checking browser AI support…');
+  S.gpuAvail=await checkWebGPU();
+  hideSpin();
+  if(!S.gpuAvail){S.llmSkipped=true;setAIBadge('fallback');await proceedToAnalysis();return;}
+  document.getElementById('llmModal').classList.add('show');
+  document.getElementById('llmMsg').textContent='Starting download…';
+  llmInitProm=initLLM().then(ok=>{
+    if(skipLLM) return;
+    setTimeout(()=>{document.getElementById('llmModal').classList.remove('show');if(!S.llmSkipped)proceedToAnalysis();},700);
+  });
+});
+
+async function proceedToAnalysis(){
+  showSpin('Extracting JD keywords…'); await delay(300);
+  S.jdKeywords=extractKeywords(S.jdText);
+  // Lightweight role detection (keywords-based) right away for Panel 2 display
+  S.roleAnalysis=parseRoleAnalysis(null, S.jdText);
+  await delay(200);
+  showSpin('Matching against your CV…'); await delay(300);
+  const{matched,missing}=analyzeMatchFn(S.cvText,S.jdKeywords);
+  S.matched=matched; S.missing=missing;
+  S.cvSections=parseSections(S.cvText);
+  S.origScore=S.jdKeywords.length?Math.round(matched.length/S.jdKeywords.length*100):0;
+  hideSpin();
+  renderAnalysis();
+  goTo(2);
+}
+
+// ═══════════════════════════════════════════
+//  RENDER ANALYSIS
+// ═══════════════════════════════════════════
+function renderAnalysis(){
+  setRing('scoreCircle',S.origScore);
+  animCount(document.getElementById('scoreNum'),S.origScore);
+  const msg=document.getElementById('scoreMsg');
+  if(S.origScore>=80)msg.textContent='Excellent match! AI will polish the remaining gaps.';
+  else if(S.origScore>=50)msg.textContent='Good start. AI will significantly boost this score.';
+  else msg.textContent='Low match — deep AI rewriting will transform this resume!';
+
+  document.getElementById('statMatched').textContent=S.matched.length;
+  document.getElementById('statMissing').textContent=S.missing.length;
+  document.getElementById('statSections').textContent=Object.keys(S.cvSections).length;
+
+  // Role display (from fast keyword-based detection)
+  updateRoleDisplay(S.roleAnalysis);
+
+  const kwEl=document.getElementById('kwBadges');
+  kwEl.innerHTML='';
+  S.matched.forEach(k=>kwEl.innerHTML+=`<span class="kw kw-match">${esc(k)}</span>`);
+  S.missing.forEach(k=>kwEl.innerHTML+=`<span class="kw kw-miss">${esc(k)}</span>`);
+
+  const useLLM=!S.llmSkipped&&S.gpuAvail;
+  const role=S.roleAnalysis||{type:'Professional',seniority:'Senior'};
+  const items=[
+    {icon:'zap', text:useLLM?`Rewrite Professional Summary with ${role.tone?.[0]||'professional'} tone suited to ${role.seniority} ${role.type}.`:`Add top ${S.missing.length} missing keywords to Skills and Summary.`},
+    {icon:'edit', text:useLLM?`Transform ${Math.min(8,S.cvSections.experience?.length||0)} experience bullets: duty→achievement, add metrics placeholders.`:`Keyword-match and embed missing terms in relevant sections.`},
+    {icon:'list', text:useLLM?`Reorder Skills section by JD relevance with category groupings.`:`Append missing keywords to Skills section.`},
+    {icon:'tag', text:useLLM?`Generate a targeted professional headline for ${role.type} role.`:`Preserve ${S.matched.length} already-matching keywords.`},
+    {icon:'check', text:`ATS-optimized structure: Summary → Skills → Experience for ${role.seniority} ${role.type}.`},
+  ];
+  const ICONS={
+    zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+    edit:'<path d="M11 4H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+    list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+    tag:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    check:'<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+  };
+  document.getElementById('impList').innerHTML=items.map(({icon,text})=>`
+    <li>
+      <svg class="imp-icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[icon]}</svg>
+      ${esc(text)}
+    </li>`).join('');
+}
+
+// ═══════════════════════════════════════════
+//  OPTIMIZE BUTTON
+// ═══════════════════════════════════════════
+document.getElementById('btnOptimize').addEventListener('click',async()=>{
+  goTo(3);
+  const procEl=document.getElementById('procSteps');
+  const preview=document.getElementById('resumePreview');
+  procEl.style.display='block';
+  preview.innerHTML=''; preview.contentEditable='false';
+  document.getElementById('btnToDownload').style.display='none';
+  document.getElementById('btnMakeEditable').style.display='inline-flex';
+  document.getElementById('baToggle').style.display='none';
+  document.getElementById('changelogWrap').style.display='none';
+  document.getElementById('fillBanner').classList.remove('show');
+
+  // Store original for before/after diff highlighting
+  S.originalSections=JSON.parse(JSON.stringify(S.cvSections));
+  const addedSet0=new Set();
+  S.originalHTML=buildHTML(S.cvSections, addedSet0);
+
+  const useLLM=S.llmReady&&!S.llmSkipped;
+
+  // If LLM still loading, wait for it (up to 45s)
+  if(!S.llmSkipped&&S.gpuAvail&&!S.llmReady&&llmInitProm){
+    setPStep(0,'active');
+    document.getElementById('ps0').childNodes[1] &&
+      (document.getElementById('ps0').lastChild.textContent=' Waiting for AI model…');
+    await Promise.race([llmInitProm, delay(45000)]);
+    document.getElementById('ps0').lastChild &&
+      (document.getElementById('ps0').lastChild.textContent=' Parsing CV structure…');
+  }
+  setPStep(0,useLLM||S.llmReady?'active':'done');
+
+  let optimizedSections;
+  if(S.llmReady&&!S.llmSkipped){
+    try{ optimizedSections=await optimizeWithLLM(S.cvSections,S.jdKeywords,S.missing,S.jdText); }
+    catch(err){ console.warn('LLM failed, using fallback:',err); optimizedSections=optimizeRuleBased(S.cvSections,S.missing); }
+  } else {
+    // Set all steps done quickly for rule-based
+    for(let i=0;i<6;i++){setPStep(i,'active');await delay(120);setPStep(i,'done');}
+    optimizedSections=optimizeRuleBased(S.cvSections,S.missing);
+  }
+
+  // Final step — apply fill-in markers and finish
+  setPStep(6,'active');
+  await delay(200);
+
+  S.optimizedSections=optimizedSections;
+  const addedSet=new Set(S.addedKeywords);
+
+  // Final render — diff highlights ALL changed words, fill-in marks placeholders
+  let html=buildHTML(optimizedSections, addedSet, S.originalSections);
+  html=markFillIns(html);
+  preview.innerHTML=html;
+  preview.contentEditable='false';
+  setPStep(6,'done');
+  await delay(300);
+
+  // Show fill-in banner if any placeholders
+  if(html.includes('class="fill"')) document.getElementById('fillBanner').classList.add('show');
+
+  procEl.style.display='none';
+  document.getElementById('btnToDownload').style.display='inline-flex';
+  document.getElementById('baToggle').style.display='flex';
+  hideStream();
+
+  // If rule-based mode, render changelog now (LLM mode already streamed it live)
+  if(!S.llmReady||S.llmSkipped){
+    renderChangelog();
+    setTimeout(()=>{
+      const b=document.getElementById('changelogBody');
+      if(b&&!b.classList.contains('open')){b.classList.add('open');document.getElementById('clChevron').style.transform='rotate(180deg)';}
+    },500);
+  }
+});
+
+// ═══════════════════════════════════════════
+//  CONTINUE TO DOWNLOAD
+// ═══════════════════════════════════════════
+document.getElementById('btnToDownload').addEventListener('click',()=>{
+  const txt=document.getElementById('resumePreview').innerText;
+  const{matched}=analyzeMatchFn(txt,S.jdKeywords);
+  S.finalScore=S.jdKeywords.length?Math.round(matched.length/S.jdKeywords.length*100):0;
+  setRing('finalCircle',S.finalScore);
+  animCount(document.getElementById('finalNum'),S.finalScore);
+  // Populate clean print area
+  const pa=document.getElementById('printArea');
+  pa.innerHTML=document.getElementById('resumePreview').innerHTML;
+  pa.querySelectorAll('mark,.fill').forEach(m=>m.replaceWith(document.createTextNode(m.textContent)));
+  goTo(4);
+});
+
+// ═══════════════════════════════════════════
+//  PDF DOWNLOAD
+// ═══════════════════════════════════════════
+document.getElementById('dlPdf').addEventListener('click',async()=>{
+  showSpin('Generating PDF…');await delay(100);
+  try{
+    const{jsPDF}=window.jspdf;
+    const pa=document.getElementById('printArea');
+    const canvas=await html2canvas(pa,{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pw=pdf.internal.pageSize.getWidth(), ph=pdf.internal.pageSize.getHeight();
+    const margin=8;
+    const usW=pw-margin*2;          // printable width (mm)
+    const usH=ph-margin*2;          // printable height per page (mm) — preserves top + bottom margin
+
+    // Canvas pixels → mm conversion
+    const pxPerMm = canvas.width / usW;
+    const pageHeightPx = Math.round(usH * pxPerMm);
+    // html2canvas scale factor: canvas.width / printArea.offsetWidth
+    const scaleFactor = canvas.width / pa.offsetWidth;
+
+    // ── Smart page-break calculation ──
+    // Collect every child element's top & bottom in canvas-pixel space
+    const elBounds = [...pa.querySelectorAll('h1,h2,p,.bullet,.cl,br')]
+      .map(el => {
+        const top = Math.floor(el.offsetTop * scaleFactor);
+        const bottom = Math.ceil((el.offsetTop + el.offsetHeight) * scaleFactor);
+        return { top, bottom };
+      })
+      .filter(b => b.bottom > b.top);
+
+    // Build an array of break points that never cut through an element
+    const breakPoints = [0];
+    let idealBreak = pageHeightPx;
+    while (idealBreak < canvas.height) {
+      let breakAt = idealBreak;
+      // Walk elements to find one that straddles the ideal cut line
+      for (const b of elBounds) {
+        if (b.top < idealBreak && b.bottom > idealBreak) {
+          // Element would be clipped — move break to just above its top
+          breakAt = Math.max(b.top - 2, breakPoints[breakPoints.length - 1] + 10);
+          break;
+        }
+      }
+      breakPoints.push(Math.round(breakAt));
+      idealBreak = breakAt + pageHeightPx; // next ideal break from the adjusted position
+    }
+
+    // ── Render one canvas slice per page ──
+    for (let i = 0; i < breakPoints.length; i++) {
+      const start = breakPoints[i];
+      const end = i + 1 < breakPoints.length ? breakPoints[i + 1] : canvas.height;
+      const sliceH = end - start;
+      if (sliceH <= 0) continue;
+      const slice = document.createElement('canvas');
+      slice.width = canvas.width; slice.height = sliceH;
+      slice.getContext('2d').drawImage(canvas, 0, -start);
+      if (i > 0) pdf.addPage();
+      pdf.addImage(slice.toDataURL('image/png'), 'PNG', margin, margin, usW, sliceH / pxPerMm, undefined, 'FAST');
+    }
+    pdf.save('optimized-resume.pdf');
+  }catch(err){alert('PDF error: '+err.message);}
+  hideSpin();
+});
+
+// ═══════════════════════════════════════════
+//  DOCX DOWNLOAD
+// ═══════════════════════════════════════════
+document.getElementById('dlDocx').addEventListener('click',async()=>{
+  showSpin('Generating Word document…');await delay(100);
+  try{
+    const docxLib = window.docx;
+    if(!docxLib) throw new Error('docx library failed to load — please refresh the page');
+    const{Document,Packer,Paragraph,TextRun,BorderStyle}=docxLib;
+    const preview=document.getElementById('resumePreview');
+    const children=[];
+    for(const node of preview.childNodes){
+      if(node.nodeType!==1) continue;
+      const tag=node.tagName.toLowerCase();
+      const txt=(node.innerText||node.textContent||'').trim();
+      if(!txt) continue;
+      if(tag==='h1'){
+        children.push(new Paragraph({spacing:{after:60},children:[new TextRun({text:txt,bold:true,size:36,font:'Calibri'})]}));
+      }else if(tag==='h2'){
+        children.push(new Paragraph({spacing:{before:220,after:60},
+          border:{bottom:{style:BorderStyle.SINGLE,size:6,color:'C7D2FE'}},
+          children:[new TextRun({text:txt.toUpperCase(),bold:true,size:20,font:'Calibri',color:'4F46E5'})]}));
+      }else if(node.classList.contains('cl')){
+        children.push(new Paragraph({spacing:{after:30},children:[new TextRun({text:txt,size:18,font:'Calibri',color:'64748B'})]}));
+      }else if(node.classList.contains('bullet')){
+        children.push(new Paragraph({spacing:{after:50},indent:{left:220},
+          children:[new TextRun({text:'• ',size:21,font:'Calibri',color:'4F46E5'}),new TextRun({text:txt,size:21,font:'Calibri'})]}));
+      }else{
+        children.push(new Paragraph({spacing:{after:55},children:[new TextRun({text:txt,size:21,font:'Calibri'})]}));
+      }
+    }
+    const wd=new Document({sections:[{properties:{page:{margin:{top:720,right:900,bottom:720,left:900}}},children}]});
+    const blob=await Packer.toBlob(wd);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download='optimized-resume.docx';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  }catch(err){alert('DOCX error: '+err.message);}
+  hideSpin();
+});
+
+// ═══════════════════════════════════════════
+//  INIT — WebGPU check on load
+// ═══════════════════════════════════════════
+(async()=>{
+  const ok=await checkWebGPU(); S.gpuAvail=ok;
+  const el=document.getElementById('gpuStatus');
+  el.innerHTML=ok
+    ?`<span style="color:var(--success);font-weight:600">● WebGPU ready</span> · Full AI optimization enabled`
+    :`<span style="color:var(--muted)">○ WebGPU not detected</span> · Smart rule-based mode`;
+})();
+</script>
+</body>
+</html>
