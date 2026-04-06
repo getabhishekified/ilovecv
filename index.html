@@ -59,6 +59,9 @@
 <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
+/* ── Web Fonts — loaded before everything so cascade works correctly ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Code+Pro:wght@400;500;600&display=swap');
+
 :root{
   --bg:#f8f9fc;--surface:#fff;--primary:#4f46e5;--pl:#e0e7ff;--pd:#3730a3;
   --text:#1e293b;--muted:#64748b;--border:#e2e8f0;
@@ -169,20 +172,78 @@ textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ── Resume preview ── */
-.resume-editable{min-height:460px;border:1px solid var(--border);border-radius:8px;padding:28px 32px;outline:none;font-size:.9rem;line-height:1.75;background:#fff;font-family:'Calibri','Georgia',serif;position:relative}
+.resume-editable{
+  min-height:460px;border:1px solid var(--border);border-radius:8px;
+  padding:32px 36px;outline:none;
+  font-size:.93rem;line-height:1.8;background:#fff;
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  position:relative;color:#1e293b;
+}
 .resume-editable:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--pl)}
-.resume-editable h1{font-size:1.38rem;font-weight:700;margin-bottom:1px;letter-spacing:.01em}
-.resume-editable h2{font-size:.93rem;font-weight:700;color:var(--primary);margin-top:17px;margin-bottom:5px;border-bottom:1.5px solid var(--pl);padding-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
-.resume-editable p{margin-bottom:4px}
-.resume-editable .cl{color:var(--muted);font-size:.82rem;margin-bottom:2px}
-.resume-editable .job-title-line{font-weight:700;font-size:.93rem;margin-bottom:1px}
-.resume-editable .job-meta-line{color:var(--muted);font-size:.8rem;margin-bottom:4px}
-.resume-editable .bullet{padding-left:16px;position:relative;margin-bottom:4px}
-.resume-editable .bullet::before{content:'•';position:absolute;left:2px;color:var(--primary)}
-/* keyword highlight */
-.resume-editable mark{background:#fef3c7;border-radius:2px;padding:0 2px}
-/* fill-in placeholder */
-.resume-editable .fill{background:#fce7f3;color:#9d174d;border:1px dashed #f9a8d4;border-radius:3px;padding:0 4px;cursor:pointer;font-size:.84em;font-weight:600}
+/* Name */
+.resume-editable h1{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:1.55rem;font-weight:700;margin-bottom:3px;
+  letter-spacing:-.02em;color:#0f172a;line-height:1.2;
+}
+/* Section headings */
+.resume-editable h2{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:.75rem;font-weight:700;color:var(--primary);
+  margin-top:22px;margin-bottom:8px;
+  border-bottom:2px solid var(--pl);padding-bottom:4px;
+  text-transform:uppercase;letter-spacing:.1em;line-height:1;
+}
+.resume-editable p{margin-bottom:5px;line-height:1.75}
+/* Contact line below name */
+.resume-editable .cl{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--muted);font-size:.82rem;margin-bottom:3px;line-height:1.5;
+}
+/* Job title inside experience / education / projects */
+.resume-editable .job-title-line{
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:700;font-size:.95rem;margin-top:14px;margin-bottom:2px;color:#0f172a;
+  line-height:1.4;
+}
+/* Remove top margin on first entry (right after a section h2) */
+.resume-editable h2 + .job-title-line{ margin-top:4px; }
+/* Company / date / location line */
+.resume-editable .job-meta-line{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--muted);font-size:.8rem;margin-bottom:5px;font-style:italic;line-height:1.4;
+}
+/* Skills section — category label */
+.resume-editable .skill-cat{
+  font-family:'Inter',system-ui,sans-serif;
+  font-weight:700;color:#0f172a;
+}
+/* Skills row (category: items) */
+.resume-editable .skill-row{ margin-bottom:5px;line-height:1.75; }
+/* Certifications / languages single-line entries */
+.resume-editable .cert-line{
+  font-family:'Inter',system-ui,sans-serif;
+  padding-left:18px;position:relative;margin-bottom:4px;line-height:1.7;
+}
+.resume-editable .cert-line::before{
+  content:'▪';position:absolute;left:3px;color:var(--primary);font-size:.8em;top:2px;
+}
+/* Bullet point */
+.resume-editable .bullet{
+  font-family:'Inter',system-ui,sans-serif;
+  padding-left:18px;position:relative;margin-bottom:5px;line-height:1.75;
+}
+.resume-editable .bullet::before{
+  content:'•';position:absolute;left:3px;
+  color:var(--primary);font-weight:900;font-style:normal;
+}
+/* Keyword highlight */
+.resume-editable mark{background:#fef9c3;border-radius:3px;padding:0 3px;color:inherit}
+/* Fill-in placeholder */
+.resume-editable .fill{
+  background:#fce7f3;color:#9d174d;border:1px dashed #f9a8d4;
+  border-radius:3px;padding:0 4px;cursor:pointer;font-size:.84em;font-weight:600;
+}
 .fill-hint{font-size:.72rem;color:#9d174d;margin-left:4px;font-style:italic}
 
 /* ── Processing steps ── */
@@ -314,17 +375,40 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:22px
 .footer-links span{display:flex;align-items:center;gap:4px}
 .footer-links svg{flex-shrink:0}
 
-/* ── Print area ── */
-#printArea{position:fixed;left:-9999px;top:0;width:794px;background:#fff;padding:46px 54px;font-family:'Calibri',Arial,sans-serif;font-size:11pt;line-height:1.55;color:#111;box-sizing:border-box}
-#printArea h1{font-size:19pt;font-weight:700;margin-bottom:2px}
-#printArea .cl{font-size:9.5pt;color:#555;margin-bottom:9px}
-#printArea h2{font-size:10pt;font-weight:700;color:#4f46e5;border-bottom:1.5px solid #c7d2fe;margin-top:13px;margin-bottom:5px;padding-bottom:2px;text-transform:uppercase;letter-spacing:.06em}
-#printArea p{margin-bottom:4px}
-#printArea .bullet{padding-left:13px;position:relative;margin-bottom:3px}
-#printArea .bullet::before{content:'•';position:absolute;left:1px;color:#4f46e5}
+/* ── Print area (mirrors preview — same font stack) ── */
+#printArea{
+  position:fixed;left:-9999px;top:0;width:794px;background:#fff;
+  padding:46px 54px;
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;
+  font-size:10.5pt;line-height:1.7;color:#1e293b;box-sizing:border-box;
+}
+#printArea h1{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:20pt;font-weight:700;margin-bottom:3px;
+  letter-spacing:-.02em;color:#0f172a;line-height:1.2;
+}
+#printArea .cl{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:9pt;color:#64748b;margin-bottom:10px;
+}
+#printArea h2{
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:8pt;font-weight:700;color:#4f46e5;
+  border-bottom:2px solid #c7d2fe;
+  margin-top:14px;margin-bottom:6px;padding-bottom:3px;
+  text-transform:uppercase;letter-spacing:.1em;
+}
+#printArea p{margin-bottom:5px;line-height:1.65}
+#printArea .bullet{padding-left:14px;position:relative;margin-bottom:4px;line-height:1.65}
+#printArea .bullet::before{content:'•';position:absolute;left:2px;color:#4f46e5;font-weight:900}
 #printArea mark,#printArea .fill{background:transparent!important;color:inherit!important;border:none!important}
-#printArea .job-title-line{font-weight:700;font-size:10.5pt}
-#printArea .job-meta-line{font-size:9.5pt;color:#555;margin-bottom:3px}
+#printArea .job-title-line{font-weight:700;font-size:10pt;color:#0f172a;margin-top:10pt;margin-bottom:1pt}
+#printArea h2 + .job-title-line{margin-top:3pt}
+#printArea .job-meta-line{font-size:9pt;color:#64748b;margin-bottom:4pt;font-style:italic}
+#printArea .skill-cat{font-weight:700;color:#0f172a}
+#printArea .skill-row{margin-bottom:3pt}
+#printArea .cert-line{padding-left:12pt;position:relative;margin-bottom:2pt}
+#printArea .cert-line::before{content:'▪';position:absolute;left:2pt;color:#4f46e5;font-size:.8em}
 
 /* ══════════════════════════════════════════
    TEMPLATE PICKER UI
@@ -351,130 +435,253 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:22px
 .th-dot-text{height:4px;border-radius:2px;flex:1;opacity:.7}
 
 /* ══════════════════════════════════════════
-   TEMPLATE DEFINITIONS — applied to .resume-editable & #printArea
+   TEMPLATE DEFINITIONS
+   Selector specificity = 2 classes + element (.resume-editable.tpl-X h1)
+   which always beats the base 1 class + element (.resume-editable h1)
+   → no !important needed on child elements
 ══════════════════════════════════════════ */
 
-/* ── Template: Modern (default) — no overrides, uses existing styles ── */
+/* ── 1. Modern (default — base styles already define this) ── */
+/* No overrides needed */
 
-/* ── Template: Classic Pro ── */
-.tpl-classic{font-family:'Georgia','Times New Roman',serif!important}
-.tpl-classic h1{font-size:1.55rem;font-weight:700;text-align:center;letter-spacing:.02em;color:#1a1a1a}
-.tpl-classic h2{color:#1a1a1a;border-bottom:2px solid #1a1a1a;font-family:'Georgia',serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.tpl-classic p,.tpl-classic .bullet,.tpl-classic .job-title-line,.tpl-classic .job-meta-line{font-family:'Georgia',serif}
-.tpl-classic .cl{text-align:center;color:#555;font-family:'Georgia',serif}
-.tpl-classic .bullet::before{color:#1a1a1a}
+/* ── 2. Classic Pro — Lora serif, centered header, traditional ── */
+.resume-editable.tpl-classic,
+#printArea.tpl-classic {
+  font-family:'Lora','Georgia','Times New Roman',serif;
+}
+.resume-editable.tpl-classic h1,
+#printArea.tpl-classic h1 {
+  font-family:'Lora',serif;
+  font-size:1.6rem;font-weight:700;
+  text-align:center;letter-spacing:.01em;color:#1a1a1a;
+}
+.resume-editable.tpl-classic h2,
+#printArea.tpl-classic h2 {
+  font-family:'Lora',serif;
+  color:#1a1a1a;border-bottom:2px solid #1a1a1a;
+  font-weight:700;font-style:normal;text-transform:uppercase;letter-spacing:.08em;
+}
+.resume-editable.tpl-classic .cl,
+#printArea.tpl-classic .cl {
+  font-family:'Lora',serif;
+  text-align:center;color:#555;
+}
+.resume-editable.tpl-classic p,
+.resume-editable.tpl-classic .bullet,
+.resume-editable.tpl-classic .job-title-line,
+.resume-editable.tpl-classic .job-meta-line,
+#printArea.tpl-classic p,
+#printArea.tpl-classic .bullet,
+#printArea.tpl-classic .job-title-line,
+#printArea.tpl-classic .job-meta-line {
+  font-family:'Lora',serif;
+}
+.resume-editable.tpl-classic .bullet::before,
+#printArea.tpl-classic .bullet::before { color:#1a1a1a; }
 
-/* ── Template: Minimalist ── */
-.tpl-minimal h1{font-size:1.65rem;font-weight:300;letter-spacing:-.01em;color:#1e293b}
-.tpl-minimal h2{color:#94a3b8;font-weight:500;text-transform:uppercase;letter-spacing:.14em;font-size:.78rem;border-bottom:1px solid #e2e8f0;padding-bottom:4px}
-.tpl-minimal .bullet::before{color:#94a3b8}
-.tpl-minimal .cl{color:#94a3b8;font-size:.82rem}
-.tpl-minimal .job-title-line{font-weight:600;color:#334155}
+/* ── 3. Minimalist — Inter, ultra-light heading, slate tones ── */
+.resume-editable.tpl-minimal h1,
+#printArea.tpl-minimal h1 {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:1.7rem;font-weight:300;letter-spacing:-.02em;color:#0f172a;
+}
+.resume-editable.tpl-minimal h2,
+#printArea.tpl-minimal h2 {
+  font-family:'Inter',system-ui,sans-serif;
+  color:#94a3b8;font-weight:500;text-transform:uppercase;
+  letter-spacing:.15em;font-size:.72rem;
+  border-bottom:1px solid #e2e8f0;border-bottom-width:1px;
+}
+.resume-editable.tpl-minimal .cl,
+#printArea.tpl-minimal .cl { color:#94a3b8; }
+.resume-editable.tpl-minimal .job-title-line,
+#printArea.tpl-minimal .job-title-line { color:#334155;font-weight:600; }
+.resume-editable.tpl-minimal .bullet::before,
+#printArea.tpl-minimal .bullet::before { color:#94a3b8; }
 
-/* ── Template: Corporate Blue ── */
-.tpl-corporate{font-family:'Calibri','Arial',sans-serif!important}
-.tpl-corporate h1{font-size:1.5rem;font-weight:700;color:#1e3a5f}
-.tpl-corporate h2{background:#1e3a5f;color:#fff;padding:3px 10px;margin-left:-6px;margin-right:-6px;border-bottom:none;border-radius:2px;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
-.tpl-corporate .bullet::before{color:#1e3a5f}
-.tpl-corporate .cl{color:#1e3a5f;font-weight:500}
+/* ── 4. Corporate Blue — Inter, navy fill on section headers ── */
+.resume-editable.tpl-corporate h1,
+#printArea.tpl-corporate h1 {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:1.55rem;font-weight:700;color:#1e3a5f;
+}
+.resume-editable.tpl-corporate h2,
+#printArea.tpl-corporate h2 {
+  font-family:'Inter',system-ui,sans-serif;
+  background:#1e3a5f;color:#fff;
+  padding:4px 10px;margin-left:-6px;margin-right:-6px;
+  border-bottom:none;border-radius:2px;
+  font-size:.73rem;text-transform:uppercase;letter-spacing:.07em;
+}
+.resume-editable.tpl-corporate .cl,
+#printArea.tpl-corporate .cl { color:#1e3a5f;font-weight:500; }
+.resume-editable.tpl-corporate .bullet::before,
+#printArea.tpl-corporate .bullet::before { color:#1e3a5f; }
+.resume-editable.tpl-corporate .job-title-line,
+#printArea.tpl-corporate .job-title-line { color:#1e3a5f; }
 
-/* ── Template: Tech ── */
-.tpl-tech{font-family:'Consolas','Courier New',monospace!important;font-size:.87rem!important}
-.tpl-tech h1{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:1.35rem;color:#0f172a;font-weight:800}
-.tpl-tech h2{color:#059669;border-bottom:1.5px solid #059669;font-family:-apple-system,sans-serif;font-size:.78rem;text-transform:uppercase;letter-spacing:.1em}
-.tpl-tech .bullet::before{content:'▸';color:#059669}
-.tpl-tech .cl{color:#64748b;font-family:-apple-system,sans-serif}
-.tpl-tech .job-title-line{color:#059669}
+/* ── 5. Tech — Source Code Pro monospace, green accent ── */
+.resume-editable.tpl-tech,
+#printArea.tpl-tech {
+  font-family:'Source Code Pro','Courier New',monospace;
+  font-size:.86rem;line-height:1.85;
+}
+.resume-editable.tpl-tech h1,
+#printArea.tpl-tech h1 {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:1.4rem;font-weight:800;color:#0f172a;letter-spacing:-.01em;
+}
+.resume-editable.tpl-tech h2,
+#printArea.tpl-tech h2 {
+  font-family:'Inter',system-ui,sans-serif;
+  color:#059669;border-bottom:2px solid #059669;
+  font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;
+}
+.resume-editable.tpl-tech .cl,
+#printArea.tpl-tech .cl {
+  font-family:'Inter',system-ui,sans-serif;
+  color:#64748b;
+}
+.resume-editable.tpl-tech .bullet::before,
+#printArea.tpl-tech .bullet::before { content:'▸';color:#059669; }
+.resume-editable.tpl-tech .job-title-line,
+#printArea.tpl-tech .job-title-line { color:#059669;font-weight:600; }
 
-/* ── Template: Warm Elegance ── */
-.tpl-elegant{font-family:'Georgia','Palatino Linotype',serif!important}
-.tpl-elegant h1{font-size:1.55rem;font-weight:700;color:#78350f;letter-spacing:.01em}
-.tpl-elegant h2{color:#92400e;border-bottom:1px solid #fbbf24;font-style:italic;text-transform:none;letter-spacing:.02em;font-weight:600}
-.tpl-elegant .bullet::before{content:'◆';color:#92400e;font-size:.5em;top:5px}
-.tpl-elegant .cl{color:#92400e}
-.tpl-elegant p,.tpl-elegant .bullet,.tpl-elegant .job-title-line{font-family:'Georgia',serif}
+/* ── 6. Warm Elegance — Lora italic serif, amber tones ── */
+.resume-editable.tpl-elegant,
+#printArea.tpl-elegant {
+  font-family:'Lora','Georgia',serif;
+}
+.resume-editable.tpl-elegant h1,
+#printArea.tpl-elegant h1 {
+  font-family:'Lora',serif;
+  font-size:1.6rem;font-weight:700;color:#78350f;letter-spacing:.01em;
+}
+.resume-editable.tpl-elegant h2,
+#printArea.tpl-elegant h2 {
+  font-family:'Lora',serif;
+  color:#92400e;border-bottom:1.5px solid #fbbf24;
+  font-style:italic;text-transform:none;letter-spacing:.02em;font-weight:600;
+}
+.resume-editable.tpl-elegant .cl,
+#printArea.tpl-elegant .cl { color:#92400e; }
+.resume-editable.tpl-elegant p,
+.resume-editable.tpl-elegant .bullet,
+.resume-editable.tpl-elegant .job-title-line,
+.resume-editable.tpl-elegant .job-meta-line,
+#printArea.tpl-elegant p,
+#printArea.tpl-elegant .bullet,
+#printArea.tpl-elegant .job-title-line,
+#printArea.tpl-elegant .job-meta-line { font-family:'Lora',serif; }
+.resume-editable.tpl-elegant .bullet::before,
+#printArea.tpl-elegant .bullet::before { content:'◆';color:#92400e;font-size:.55em;top:4px; }
 
-/* ── Template: Executive ── */
-.tpl-executive h1{font-size:1.75rem;font-weight:800;color:#0f172a;letter-spacing:-.01em;text-transform:uppercase}
-.tpl-executive h2{color:#0f172a;border-bottom:3px solid #0f172a;text-transform:uppercase;letter-spacing:.1em;font-size:.8rem}
-.tpl-executive .bullet::before{color:#0f172a;content:'—';font-size:.85em;top:0}
-.tpl-executive .cl{font-weight:600;color:#374151}
-.tpl-executive .job-title-line{font-weight:700;font-size:.95rem}
+/* ── 7. Executive — Inter bold, charcoal, thick dividers ── */
+.resume-editable.tpl-executive h1,
+#printArea.tpl-executive h1 {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:1.8rem;font-weight:800;color:#0f172a;
+  letter-spacing:-.02em;text-transform:uppercase;
+}
+.resume-editable.tpl-executive h2,
+#printArea.tpl-executive h2 {
+  font-family:'Inter',system-ui,sans-serif;
+  color:#0f172a;border-bottom:3px solid #0f172a;
+  text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;
+}
+.resume-editable.tpl-executive .cl,
+#printArea.tpl-executive .cl { font-weight:600;color:#374151; }
+.resume-editable.tpl-executive .bullet::before,
+#printArea.tpl-executive .bullet::before { content:'–';color:#0f172a;font-weight:700;font-size:.9em;top:1px; }
+.resume-editable.tpl-executive .job-title-line,
+#printArea.tpl-executive .job-title-line { font-weight:700;font-size:.96rem;color:#0f172a; }
 
-/* ── Template: Creative Teal ── */
-.tpl-creative h1{font-size:1.45rem;font-weight:700;color:#0f766e}
-.tpl-creative h2{color:#0f766e;border-bottom:none;border-left:4px solid #0f766e;padding-left:10px;margin-left:-4px;text-transform:uppercase;letter-spacing:.05em}
-.tpl-creative .bullet::before{color:#0f766e}
-.tpl-creative .cl{color:#0f766e}
-.tpl-creative .job-title-line{color:#0d9488}
+/* ── 8. Creative Teal — Inter, teal left-border sections ── */
+.resume-editable.tpl-creative h1,
+#printArea.tpl-creative h1 {
+  font-family:'Inter',system-ui,sans-serif;
+  font-size:1.55rem;font-weight:700;color:#0f766e;
+}
+.resume-editable.tpl-creative h2,
+#printArea.tpl-creative h2 {
+  font-family:'Inter',system-ui,sans-serif;
+  color:#0f766e;border-bottom:none;
+  border-left:4px solid #0f766e;padding-left:10px;margin-left:-4px;
+  text-transform:uppercase;letter-spacing:.07em;
+}
+.resume-editable.tpl-creative .cl,
+#printArea.tpl-creative .cl { color:#0f766e; }
+.resume-editable.tpl-creative .bullet::before,
+#printArea.tpl-creative .bullet::before { color:#0f766e; }
+.resume-editable.tpl-creative .job-title-line,
+#printArea.tpl-creative .job-title-line { color:#0d9488;font-weight:600; }
 
-/* ── Template: Academic ── */
-.tpl-academic{font-family:'Times New Roman','Georgia',serif!important}
-.tpl-academic h1{font-size:1.4rem;font-weight:700;text-align:center;font-family:'Times New Roman',serif}
-.tpl-academic h2{color:#1e293b;border-bottom:1px solid #1e293b;text-transform:uppercase;letter-spacing:.05em;font-family:'Times New Roman',serif;font-size:.88rem}
-.tpl-academic .cl{text-align:center;color:#475569;font-family:'Times New Roman',serif}
-.tpl-academic p,.tpl-academic .bullet,.tpl-academic .job-title-line,.tpl-academic .job-meta-line{font-family:'Times New Roman',serif}
-.tpl-academic .bullet::before{color:#1e293b}
+/* ── 9. Academic — Lora serif, centered, traditional ── */
+.resume-editable.tpl-academic,
+#printArea.tpl-academic {
+  font-family:'Lora','Times New Roman',serif;
+}
+.resume-editable.tpl-academic h1,
+#printArea.tpl-academic h1 {
+  font-family:'Lora',serif;
+  font-size:1.5rem;font-weight:700;text-align:center;color:#1e293b;
+}
+.resume-editable.tpl-academic h2,
+#printArea.tpl-academic h2 {
+  font-family:'Lora',serif;
+  color:#1e293b;border-bottom:1px solid #1e293b;
+  text-transform:uppercase;letter-spacing:.06em;font-size:.8rem;
+  font-style:normal;
+}
+.resume-editable.tpl-academic .cl,
+#printArea.tpl-academic .cl {
+  font-family:'Lora',serif;
+  text-align:center;color:#475569;
+}
+.resume-editable.tpl-academic p,
+.resume-editable.tpl-academic .bullet,
+.resume-editable.tpl-academic .job-title-line,
+.resume-editable.tpl-academic .job-meta-line,
+#printArea.tpl-academic p,
+#printArea.tpl-academic .bullet,
+#printArea.tpl-academic .job-title-line,
+#printArea.tpl-academic .job-meta-line { font-family:'Lora',serif; }
+.resume-editable.tpl-academic .bullet::before,
+#printArea.tpl-academic .bullet::before { color:#1e293b; }
 
-/* ── Template: ATS Optimized ── */
-.tpl-ats{font-family:'Arial',Helvetica,sans-serif!important;font-size:.88rem!important}
-.tpl-ats h1{font-size:1.25rem;font-weight:700;color:#000}
-.tpl-ats h2{color:#000;border-bottom:1px solid #000;text-transform:uppercase;letter-spacing:0;font-size:.84rem;background:none;padding:0;margin-left:0}
-.tpl-ats .bullet::before{color:#000}
-.tpl-ats .cl{color:#333}
-.tpl-ats mark{background:transparent!important;color:inherit!important}
-.tpl-ats .job-title-line{color:#000}
-.tpl-ats h2,.tpl-ats p,.tpl-ats .bullet{padding-left:0!important}
-
-/* ── printArea template overrides (mirrors .resume-editable ones) ── */
-#printArea.tpl-classic{font-family:'Georgia','Times New Roman',serif!important}
-#printArea.tpl-classic h1{text-align:center;font-size:20pt;color:#1a1a1a}
-#printArea.tpl-classic h2{color:#1a1a1a;border-bottom-color:#1a1a1a;border-bottom-width:2px}
-#printArea.tpl-classic .cl{text-align:center;color:#555}
-#printArea.tpl-classic .bullet::before{color:#1a1a1a}
-
-#printArea.tpl-minimal h1{font-size:22pt;font-weight:300;color:#1e293b}
-#printArea.tpl-minimal h2{color:#94a3b8;border-bottom-color:#e2e8f0}
-#printArea.tpl-minimal .bullet::before{color:#94a3b8}
-#printArea.tpl-minimal .cl{color:#94a3b8}
-
-#printArea.tpl-corporate h1{color:#1e3a5f;font-size:20pt}
-#printArea.tpl-corporate h2{background:#1e3a5f;color:#fff;border-bottom:none;padding:3px 8px}
-#printArea.tpl-corporate .bullet::before{color:#1e3a5f}
-#printArea.tpl-corporate .cl{color:#1e3a5f}
-
-#printArea.tpl-tech{font-family:'Consolas','Courier New',monospace!important}
-#printArea.tpl-tech h2{color:#059669;border-bottom-color:#059669}
-#printArea.tpl-tech .bullet::before{content:'▸';color:#059669}
-#printArea.tpl-tech .job-title-line{color:#059669}
-
-#printArea.tpl-elegant{font-family:'Georgia','Palatino',serif!important}
-#printArea.tpl-elegant h1{color:#78350f}
-#printArea.tpl-elegant h2{color:#92400e;border-bottom-color:#fbbf24;font-style:italic;text-transform:none}
-#printArea.tpl-elegant .bullet::before{content:'◆';color:#92400e;font-size:.5em}
-#printArea.tpl-elegant .cl{color:#92400e}
-
-#printArea.tpl-executive h1{font-size:22pt;font-weight:800;color:#0f172a;text-transform:uppercase}
-#printArea.tpl-executive h2{color:#0f172a;border-bottom:3px solid #0f172a}
-#printArea.tpl-executive .bullet::before{color:#0f172a;content:'—'}
-#printArea.tpl-executive .cl{font-weight:600;color:#374151}
-
-#printArea.tpl-creative h1{color:#0f766e}
-#printArea.tpl-creative h2{color:#0f766e;border-bottom:none;border-left:4px solid #0f766e;padding-left:10px}
-#printArea.tpl-creative .bullet::before{color:#0f766e}
-#printArea.tpl-creative .cl{color:#0f766e}
-
-#printArea.tpl-academic{font-family:'Times New Roman','Georgia',serif!important}
-#printArea.tpl-academic h1{text-align:center}
-#printArea.tpl-academic h2{color:#1e293b;border-bottom-color:#1e293b}
-#printArea.tpl-academic .cl{text-align:center;color:#475569}
-#printArea.tpl-academic .bullet::before{color:#1e293b}
-
-#printArea.tpl-ats{font-family:'Arial',Helvetica,sans-serif!important}
-#printArea.tpl-ats h1{color:#000}
-#printArea.tpl-ats h2{color:#000;border-bottom-color:#000;background:none;padding:0}
-#printArea.tpl-ats .bullet::before{color:#000}
-#printArea.tpl-ats .cl{color:#333}
+/* ── 10. ATS Pure — Arial only, no color, maximum compatibility ── */
+.resume-editable.tpl-ats,
+#printArea.tpl-ats {
+  font-family:'Arial',Helvetica,sans-serif;
+  font-size:.88rem;
+}
+.resume-editable.tpl-ats h1,
+#printArea.tpl-ats h1 {
+  font-family:'Arial',Helvetica,sans-serif;
+  font-size:1.3rem;font-weight:700;color:#000;
+}
+.resume-editable.tpl-ats h2,
+#printArea.tpl-ats h2 {
+  font-family:'Arial',Helvetica,sans-serif;
+  color:#000;border-bottom:1px solid #000;border-left:none;
+  background:none;padding:0;margin-left:0;margin-right:0;
+  text-transform:uppercase;letter-spacing:.01em;font-size:.8rem;
+}
+.resume-editable.tpl-ats .cl,
+#printArea.tpl-ats .cl { color:#333;font-family:'Arial',Helvetica,sans-serif; }
+.resume-editable.tpl-ats p,
+.resume-editable.tpl-ats .bullet,
+.resume-editable.tpl-ats .job-title-line,
+.resume-editable.tpl-ats .job-meta-line,
+#printArea.tpl-ats p,
+#printArea.tpl-ats .bullet,
+#printArea.tpl-ats .job-title-line,
+#printArea.tpl-ats .job-meta-line { font-family:'Arial',Helvetica,sans-serif; }
+.resume-editable.tpl-ats .bullet::before,
+#printArea.tpl-ats .bullet::before { color:#000; }
+.resume-editable.tpl-ats mark { background:transparent;color:inherit; }
+.resume-editable.tpl-ats .job-title-line,
+#printArea.tpl-ats .job-title-line { color:#000; }
 </style>
 </head>
 <body>
@@ -485,11 +692,11 @@ footer{background:var(--surface);border-top:1px solid var(--border);padding:22px
     <span class="modal-emoji">🧠</span>
     <h2>Setting Up AI Resume Writer</h2>
     <p class="modal-desc">
-      Downloading <strong>Llama 3.2 1B</strong> (quantized) to your browser. It runs fully on your device — your resume never leaves your machine.
+      Downloading <strong>Gemma 2 2B</strong> (quantized) to your browser. It runs fully on your device — your resume never leaves your machine.
     </p>
     <div class="model-tags">
-      <span class="model-tag">Llama 3.2 · 1B params</span>
-      <span class="model-tag">4-bit quantized · ~880 MB</span>
+      <span class="model-tag">Gemma 2 · 2B params</span>
+      <span class="model-tag">4-bit quantized · ~1.5 GB</span>
       <span class="model-tag">Cached after first use</span>
     </div>
     <div class="progress-track"><div class="progress-fill" id="llmBar"></div></div>
@@ -953,7 +1160,7 @@ async function checkWebGPU() {
 async function initLLM() {
   try {
     const { CreateMLCEngine } = await import('https://esm.run/@mlc-ai/web-llm');
-    S.llmEngine = await CreateMLCEngine('Llama-3.2-1B-Instruct-q4f16_1-MLC', {
+    S.llmEngine = await CreateMLCEngine('gemma-2-2b-it-q4f16_1-MLC', {
       initProgressCallback: ({ progress, text }) => {
         const pct = Math.min(99, Math.round((progress||0)*100));
         document.getElementById('llmBar').style.width = pct+'%';
@@ -978,7 +1185,7 @@ function setAIBadge(state) {
   b.className='ai-badge '+state;
   d.style.background=state==='ready'?'var(--success)':state==='fallback'?'var(--primary)':'#f59e0b';
   d.className='ai-dot'+(state==='loading'?' pulse':'');
-  if(state==='ready'){t.textContent='AI ready (Llama 3.2 1B) ✓';s.textContent='Deep tone-aware rewriting enabled.';}
+  if(state==='ready'){t.textContent='AI ready (Gemma 2 2B) ✓';s.textContent='Deep tone-aware rewriting enabled.';}
   else if(state==='fallback'){t.textContent='Smart optimization (no download)';s.textContent='Using rule-based keyword matching.';}
   else{t.textContent='AI model loading…';s.textContent='Preparing in background while you review.';}
 }
@@ -1526,6 +1733,154 @@ async function optimizeWithLLM(sections, jdKeywords, missing, jdText) {
 }
 
 // ═══════════════════════════════════════════
+//  LLM-BASED FORMATTING PASS
+// ═══════════════════════════════════════════
+
+// Inline renderer: HTML-escapes, highlights added keywords, converts **bold** and _em_
+function rInline(text, addedSet) {
+  // HTML escape
+  let s = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Keyword highlight (added keywords get <mark>)
+  if (addedSet && addedSet.size) {
+    addedSet.forEach(kw => {
+      const re = new RegExp('('+kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+      s = s.replace(re,'<mark class="kw">$1</mark>');
+    });
+  }
+  // **bold**
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  // _italic_
+  s = s.replace(/(?<![a-zA-Z])_([^_]+)_(?![a-zA-Z])/g,'<em>$1</em>');
+  return s;
+}
+
+// Parse LLM Markdown output → resume HTML using the same CSS classes as buildHTML
+function parseResumeMarkdown(md, addedSet) {
+  const lines = md.split('\n');
+  let html = '';
+  let inBulletGroup = false;
+
+  const closeBullets = () => { if(inBulletGroup){html+='</ul>';inBulletGroup=false;} };
+
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trimEnd();
+
+    if (!line.trim()) { closeBullets(); html += '<div class="sec-gap"></div>'; continue; }
+
+    // # Name (h1 — resume name)
+    if (/^# /.test(line)) {
+      closeBullets();
+      html += `<h1>${rInline(line.slice(2).trim(), addedSet)}</h1>`;
+      continue;
+    }
+    // ## SECTION HEADING (h2)
+    if (/^## /.test(line)) {
+      closeBullets();
+      html += `<h2>${rInline(line.slice(3).trim(), addedSet)}</h2>`;
+      continue;
+    }
+    // ### Job title / role title
+    if (/^### /.test(line)) {
+      closeBullets();
+      html += `<div class="job-title-line">${rInline(line.slice(4).trim(), addedSet)}</div>`;
+      continue;
+    }
+    // > meta / contact / date line
+    if (/^> /.test(line)) {
+      closeBullets();
+      html += `<div class="job-meta-line">${rInline(line.slice(2).trim(), addedSet)}</div>`;
+      continue;
+    }
+    // contact line starting with mailto/phone patterns (from header)
+    if (/^>>/.test(line)) {
+      closeBullets();
+      html += `<div class="cl">${rInline(line.slice(2).trim(), addedSet)}</div>`;
+      continue;
+    }
+    // - bullet point
+    if (/^[-*•] /.test(line)) {
+      if (!inBulletGroup) { html += '<ul class="bullet-list">'; inBulletGroup = true; }
+      html += `<li>${rInline(line.replace(/^[-*•] /,'').trim(), addedSet)}</li>`;
+      continue;
+    }
+    // Skill category: "Label: items…"
+    if (/^[A-Za-z][A-Za-z &\/\-]{1,35}: /.test(line) && !/^(https?:\/\/)/.test(line)) {
+      closeBullets();
+      const colon = line.indexOf(': ');
+      const cat = line.slice(0, colon);
+      const items = line.slice(colon + 2);
+      html += `<div class="skill-row"><span class="skill-cat">${rInline(cat, addedSet)}:</span> ${rInline(items, addedSet)}</div>`;
+      continue;
+    }
+    // Plain text line
+    closeBullets();
+    html += `<p>${rInline(line, addedSet)}</p>`;
+  }
+  closeBullets();
+  return html;
+}
+
+// Ask LLM to re-format the entire optimized resume as structured Markdown
+async function formatResumeWithLLM(sections, roleAnalysis, addedSet, onToken) {
+  // Build plain text from sections in canonical order
+  const ORDER = ['header','summary','objective','profile','skills','technical skills','core competencies',
+    'experience','work experience','employment','professional experience','work history',
+    'education','projects','certifications','achievements','publications','languages','interests','volunteer'];
+  const sectionKeys = [
+    ...ORDER.filter(k => sections[k]),
+    ...Object.keys(sections).filter(k => !ORDER.includes(k))
+  ];
+
+  let plain = '';
+  for (const key of sectionKeys) {
+    const lines = sections[key] || [];
+    if (!lines.length) continue;
+    if (key === 'header') {
+      // header lines go without a section label
+      plain += lines.filter(l=>l.trim()).join('\n') + '\n\n';
+    } else {
+      plain += key.toUpperCase() + '\n' + lines.filter(l=>l.trim()).join('\n') + '\n\n';
+    }
+  }
+
+  const prompt = `You are a professional resume formatter. Convert the plain-text resume below into clean, structured Markdown using ONLY these rules:
+
+- First line is the person's name → output as: # Full Name
+- Contact/location lines → output as: >> contact info (email, phone, LinkedIn, location on ONE line separated by  |)
+- Section headings (EXPERIENCE, EDUCATION, SKILLS, etc.) → output as: ## Section Name
+- Job title / role / degree → output as: ### Job Title at Company Name
+- Date / location / company meta lines → output as: > Company Name  |  Location  |  Start – End
+- Bullet points or achievements → output as: - bullet text
+- Skills with categories → output as: Category: skill1, skill2, skill3
+- Summary / objective text → output as plain paragraph
+
+DO NOT add any explanation, commentary, or prose. Output ONLY the formatted Markdown resume.
+
+PLAIN TEXT RESUME:
+${plain.slice(0, 4000)}`;
+
+  let md = '';
+  try {
+    const stream = await S.llmEngine.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.1,
+      max_tokens: 2000,
+      stream: true,
+    });
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content || '';
+      md += delta;
+      if (onToken) onToken(delta, md);
+    }
+  } catch(e) {
+    console.warn('formatResumeWithLLM failed:', e);
+    return null;
+  }
+  return md.trim();
+}
+
+// ═══════════════════════════════════════════
 //  RULE-BASED FALLBACK
 // ═══════════════════════════════════════════
 function optimizeRuleBased(sections, missing) {
@@ -1652,42 +2007,196 @@ function diffHighlight(newLine, origLines) {
   return html;
 }
 
-function renderLine(line, addedSet, isSkills, origLines=null) {
-  if(!line.trim()) return '<br>';
-  const isBullet = /^[\u2022\u2023\u25E6\u2043\-\*]\s/.test(line);
-  const text = isBullet ? line.replace(/^[\u2022\u2023\u25E6\u2043\-\*]\s*/,'') : line;
-  // Use diff-based highlighting if we have original lines; else keyword-only
-  const highlighted = origLines !== null ? diffHighlight(text, origLines) : esc(text);
-  return isBullet ? `<div class="bullet">${highlighted}</div>` : `<p>${highlighted}</p>`;
+// ═══════════════════════════════════════════
+//  SMART RESUME HTML BUILDER
+//  Section-aware rendering: detects headings, job titles, meta lines,
+//  bullets, skill categories, and cert entries properly.
+// ═══════════════════════════════════════════
+
+// ── Detect a bullet line ──
+function isBulletLine(line) {
+  return /^[\s]*[\u2022\u2023\u25E6\u2043\u25AA\u25B8\u25CF\u2013\-\*>]\s/.test(line);
 }
 
+// ── Strip leading bullet character ──
+function stripBullet(line) {
+  return line.replace(/^[\s]*[\u2022\u2023\u25E6\u2043\u25AA\u25B8\u25CF\u2013\-\*>]\s*/,'').trim();
+}
+
+// ── Detect a meta/date line (company, location, date range) ──
+function isMetaLine(line) {
+  const l = line.trim();
+  if (!l || isBulletLine(l)) return false;
+  return /\b(19|20)\d{2}\b/.test(l)          // has a 4-digit year
+    || /[|·•–—\/]/.test(l)                    // has a separator char
+    || /\b(present|current|remote|hybrid|on.?site|full.?time|part.?time|contract|internship)\b/i.test(l)
+    || /,\s*[A-Z]{2}(\s|$)/.test(l)           // "City, ST" format
+    || /\bGPA\b/i.test(l);                     // GPA line in education
+}
+
+// ── Detect a skills category line like "Languages: Python, Java" ──
+function isSkillsCategory(line) {
+  const l = line.trim();
+  if (!l || isBulletLine(l)) return false;
+  return /^[A-Za-z][A-Za-z &\/\-]{1,40}:\s*\S/.test(l);
+}
+
+// ── Render text with diff-highlight (or plain escape) ──
+function renderText(text, origLines) {
+  return origLines !== null ? diffHighlight(text.trim(), origLines) : esc(text.trim());
+}
+
+// ── HEADER SECTION: Name → h1, rest → .cl ──
+function renderHeader(lines) {
+  let html = '', first = true;
+  for (const l of lines) {
+    if (!l.trim()) continue;
+    if (first) { html += `<h1>${esc(l.trim())}</h1>\n`; first = false; }
+    else        html += `<p class="cl">${esc(l.trim())}</p>\n`;
+  }
+  return html;
+}
+
+// ── SUMMARY SECTION: Paragraphs (may include bullets) ──
+function renderSummary(lines, origLines) {
+  let html = '';
+  for (const l of lines) {
+    const t = l.trim();
+    if (!t) continue;
+    if (isBulletLine(t))
+      html += `<div class="bullet">${renderText(stripBullet(t), origLines)}</div>\n`;
+    else
+      html += `<p>${renderText(t, origLines)}</p>\n`;
+  }
+  return html;
+}
+
+// ── BLOCK SECTION: Experience / Education / Projects / Achievements ──
+// Groups lines into entry blocks (split by blank lines), then per-block:
+//   line 0  (non-bullet)            → .job-title-line
+//   line 1  (non-bullet + isMetaLine) → .job-meta-line
+//   subsequent bullet lines         → .bullet
+//   other non-bullet lines          → <p>
+function renderBlockSection(lines, origLines) {
+  let html = '';
+
+  // Split into blocks on blank lines
+  const blocks = [];
+  let cur = [];
+  for (const l of lines) {
+    if (!l.trim()) { if (cur.length) { blocks.push(cur); cur = []; } }
+    else cur.push(l.trim());
+  }
+  if (cur.length) blocks.push(cur);
+
+  for (const block of blocks) {
+    let idx = 0;
+
+    // ── Title line (first non-bullet line) ──
+    if (idx < block.length && !isBulletLine(block[idx])) {
+      html += `<div class="job-title-line">${renderText(block[idx], origLines)}</div>\n`;
+      idx++;
+    }
+
+    // ── Meta line (second non-bullet line that looks like a date/company line) ──
+    if (idx < block.length && !isBulletLine(block[idx]) && isMetaLine(block[idx])) {
+      html += `<div class="job-meta-line">${renderText(block[idx], origLines)}</div>\n`;
+      idx++;
+    }
+
+    // ── Remaining lines ──
+    for (let i = idx; i < block.length; i++) {
+      const l = block[i];
+      if (!l.trim()) continue;
+      if (isBulletLine(l))
+        html += `<div class="bullet">${renderText(stripBullet(l), origLines)}</div>\n`;
+      else
+        html += `<p>${renderText(l, origLines)}</p>\n`;
+    }
+
+    html += '\n'; // blank gap between entries
+  }
+  return html;
+}
+
+// ── SKILLS SECTION: category rows, bullets, or plain items ──
+function renderSkills(lines, origLines) {
+  let html = '';
+  for (const l of lines) {
+    const t = l.trim();
+    if (!t) continue;
+    if (isBulletLine(t)) {
+      html += `<div class="bullet">${renderText(stripBullet(t), origLines)}</div>\n`;
+    } else if (isSkillsCategory(t)) {
+      const colon = t.indexOf(':');
+      const cat   = esc(t.slice(0, colon).trim());
+      const items = renderText(t.slice(colon + 1).trim(), origLines);
+      html += `<p class="skill-row"><span class="skill-cat">${cat}:</span> ${items}</p>\n`;
+    } else {
+      html += `<p>${renderText(t, origLines)}</p>\n`;
+    }
+  }
+  return html;
+}
+
+// ── SIMPLE SECTION: Certifications, Languages, Interests, Publications ──
+// Short single-line entries get a compact cert-line bullet style
+function renderSimple(lines, origLines) {
+  let html = '';
+  for (const l of lines) {
+    const t = l.trim();
+    if (!t) continue;
+    if (isBulletLine(t)) {
+      html += `<div class="bullet">${renderText(stripBullet(t), origLines)}</div>\n`;
+    } else {
+      // Short entries (< 120 chars, no date pattern) → cert-line style
+      const isShortEntry = t.length < 120 && !/[.]{2,}/.test(t);
+      if (isShortEntry)
+        html += `<div class="cert-line">${renderText(t, origLines)}</div>\n`;
+      else
+        html += `<p>${renderText(t, origLines)}</p>\n`;
+    }
+  }
+  return html;
+}
+
+// ── MASTER buildHTML ──
 function buildHTML(sections, addedSet, origSections=null) {
-  let html='';
-  const used=new Set();
-  for(const{keys,title}of SEC_ORDER){
-    const k=keys.find(k=>sections[k]?.length>0); if(!k) continue;
+  let html = '';
+  const used = new Set();
+
+  for (const { keys, title } of SEC_ORDER) {
+    const k = keys.find(k => sections[k]?.length > 0);
+    if (!k) continue;
     used.add(k);
-    const isSkills=['skills','technologies','competencies'].includes(k);
-    // Pass original lines for diff (skip header — name/contact never change)
     const origLines = (origSections && k !== 'header') ? (origSections[k] || null) : null;
-    if(k==='header'){
-      let first=true;
-      for(const l of sections[k]){
-        if(!l.trim()) continue;
-        if(first){html+=`<h1>${esc(l)}</h1>\n`;first=false;}
-        else html+=`<p class="cl">${esc(l)}</p>\n`;
-      }
+
+    if (k === 'header') {
+      html += renderHeader(sections[k]);
       continue;
     }
-    html+=`<h2>${esc(title)}</h2>\n`;
-    sections[k].forEach(l=>{html+=renderLine(l,addedSet,isSkills,origLines)+'\n';});
+
+    html += `<h2>${esc(title)}</h2>\n`;
+
+    if (k === 'summary') {
+      html += renderSummary(sections[k], origLines);
+    } else if (['experience','education','projects','achievements','volunteer'].includes(k)) {
+      html += renderBlockSection(sections[k], origLines);
+    } else if (['skills','technologies','competencies'].includes(k)) {
+      html += renderSkills(sections[k], origLines);
+    } else {
+      html += renderSimple(sections[k], origLines);
+    }
   }
-  for(const k of Object.keys(sections)){
-    if(used.has(k)||!sections[k]?.length) continue;
-    html+=`<h2>${esc(k.charAt(0).toUpperCase()+k.slice(1))}</h2>\n`;
+
+  // Render any extra sections not in SEC_ORDER
+  for (const k of Object.keys(sections)) {
+    if (used.has(k) || !sections[k]?.length) continue;
+    html += `<h2>${esc(k.charAt(0).toUpperCase() + k.slice(1))}</h2>\n`;
     const origLines = origSections ? (origSections[k] || null) : null;
-    sections[k].forEach(l=>{html+=renderLine(l,new Set(),false,origLines)+'\n';});
+    html += renderSimple(sections[k], origLines);
   }
+
   return html;
 }
 
@@ -2219,13 +2728,38 @@ document.getElementById('dlDocx').addEventListener('click',async()=>{
         }));
       } else if(node.classList.contains('job-title-line')){
         children.push(new Paragraph({
-          spacing:{after:30},
-          children:[new TextRun({text:txt, bold:true, size:22, font:tc.font, color:tc.accent})]
+          spacing:{before:160, after:30},
+          children:[new TextRun({text:txt, bold:true, size:22, font:tc.font, color:'0f172a'})]
         }));
       } else if(node.classList.contains('job-meta-line')){
         children.push(new Paragraph({
-          spacing:{after:40},
+          spacing:{after:50},
           children:[new TextRun({text:txt, size:19, font:tc.font, color:'64748B', italics:true})]
+        }));
+      } else if(node.classList.contains('skill-row')){
+        // Skills category row: "Category: item1, item2"
+        const colon = txt.indexOf(':');
+        if(colon > 0){
+          const cat = txt.slice(0, colon+1);
+          const items = txt.slice(colon+1);
+          children.push(new Paragraph({
+            spacing:{after:50},
+            children:[
+              new TextRun({text:cat, bold:true, size:21, font:tc.font, color:'0f172a'}),
+              new TextRun({text:items, size:21, font:tc.font})
+            ]
+          }));
+        } else {
+          children.push(new Paragraph({spacing:{after:50},children:[new TextRun({text:txt,size:21,font:tc.font})]}));
+        }
+      } else if(node.classList.contains('cert-line')){
+        children.push(new Paragraph({
+          spacing:{after:45},
+          indent:{left:180},
+          children:[
+            new TextRun({text:'▪ ', size:20, font:tc.font, color:tc.accent}),
+            new TextRun({text:txt, size:21, font:tc.font})
+          ]
         }));
       } else {
         children.push(new Paragraph({
